@@ -9,7 +9,7 @@ setup(
     name='pyramid-apispec',
     version='0.1.0',
     description='TODO',
-    long_description=read('README.rst'),
+    long_description=open('README.rst').read(),
     author='Theron Luhn',
     author_email='theron@luhn.com',
     url='https://github.com/luhn/pyramid-apispec',

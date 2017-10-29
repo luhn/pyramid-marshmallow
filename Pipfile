@@ -6,4 +6,7 @@ name = "pypi"
 [packages]
 
 [dev-packages]
+
 pyramid = "*"
+webtest = "*"
+pytest = "*"
