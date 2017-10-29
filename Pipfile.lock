@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "41310cc4496bb97746fd7d1befec8abb33f97a6042eb583b92ca27cfefa60cb2"
+            "sha256": "c4da73bcd470ad7083f141cbcc3794d46dcfd11d4dac9571f44811fbbdbee828"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -26,7 +26,15 @@
             }
         ]
     },
-    "default": {},
+    "default": {
+        "marshmallow": {
+            "hashes": [
+                "sha256:3f2b795b9b0db24f92d7e2dcaa5c1dfef4a08312a0e5c738386e7aa04ec357c1",
+                "sha256:09943a460026b9a61c3f4cedd0e5ccfed7cfce3271debd19e3f97df561088718"
+            ],
+            "version": "==2.14.0"
+        }
+    },
     "develop": {
         "beautifulsoup4": {
             "hashes": [
