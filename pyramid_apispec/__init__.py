@@ -11,7 +11,11 @@ def view_validator(view, info):
         return view
 
     def wrapped(context, request):
-        result = schema.load(request.json_body)
+        if request.method == 'GET':
+            data = dict(request.GET)
+        else:
+            data = request.json_body
+        result = schema.load(data)
         if result.errors:
             raise ValidationError(result.errors)
         request.data = result.data
