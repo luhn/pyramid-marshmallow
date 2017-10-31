@@ -5,10 +5,9 @@ name = "pypi"
 
 [packages]
 marshmallow = "*"
+pyramid = "*"
 
 [dev-packages]
-
-pyramid = "*"
 webtest = "*"
 pytest = "*"
 "flake8" = "*"
