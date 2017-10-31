@@ -18,3 +18,10 @@ def test_get_validate_integration(app):
         'title': 'Hunky Dory',
         'release_date': '1971-12-17',
     }).text == 'Hunky Dory'
+
+
+def test_marshal_integration(app):
+    assert app.get('/marshal').json == {
+        'title': 'Hunky Dory',
+        'release_date': '1971-12-17',
+    }

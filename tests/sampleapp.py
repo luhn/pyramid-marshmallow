@@ -24,9 +24,17 @@ def validate(request):
     return Response(request.data['title'])
 
 
+def marshal(request):
+    return {
+        'title': 'Hunky Dory',
+        'release_date': Date(1971, 12, 17),
+    }
+
+
 @pytest.fixture(scope='session')
 def wsgi():
-    with Configurator() as config:
+    settings = {}
+    with Configurator(settings=settings) as config:
         config.include('pyramid_apispec')
 
         # Hello world
@@ -37,6 +45,13 @@ def wsgi():
         config.add_route('validate', '/validate')
         config.add_view(
             validate, route_name='validate', validate=AlbumSchema(),
+        )
+
+        # Marshaller
+        config.add_route('marshal', '/marshal')
+        config.add_view(
+            marshal, route_name='marshal', marshal=AlbumSchema(),
+            renderer='json',
         )
 
         return config.make_wsgi_app()

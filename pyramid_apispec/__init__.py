@@ -1,8 +1,10 @@
-from .exceptions import ValidationError
+from .exceptions import ValidationError, MarshalError
+from pyramid.viewderivers import VIEW
 
 
 def includeme(config):
     config.add_view_deriver(view_validator)
+    config.add_view_deriver(view_marshaller, under='rendered_view', over=VIEW)
 
 
 def view_validator(view, info):
@@ -25,3 +27,21 @@ def view_validator(view, info):
 
 
 view_validator.options = ('validate',)
+
+
+def view_marshaller(view, info):
+    schema = info.options.get('marshal')
+    if schema is None:
+        return view
+
+    def wrapped(context, request):
+        output = view(context, request)
+        result = schema.dump(output)
+        if result.errors:
+            raise MarshalError(result.errors)
+        return result.data
+
+    return wrapped
+
+
+view_marshaller.options = ('marshal',)
