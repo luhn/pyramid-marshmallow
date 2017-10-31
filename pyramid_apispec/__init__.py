@@ -1,5 +1,12 @@
-from .exceptions import ValidationError, MarshalError
+from .exceptions import SchemaError, ValidationError, MarshalError
 from pyramid.viewderivers import VIEW
+
+
+__all__ = [
+    'SchemaError',
+    'ValidationError',
+    'MarshalError',
+]
 
 
 def includeme(config):
