@@ -52,7 +52,6 @@ def create_spec(introspector):
                     'schema': add_definition(spec, view['validate']),
                 }]
             if 'marshal' in view:
-                print(path, id(view['marshal']))
                 op['responses'] = {
                     '200': {
                         'description': 'Some response',
