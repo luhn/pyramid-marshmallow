@@ -6,6 +6,11 @@ def test_hello_world(app):
     assert r.text == 'Hello World!'
 
 
+def test_traversal_hello(app):
+    r = app.get('/traversal/hello')
+    assert r.text == 'Hello World!'
+
+
 def test_post_validate_integration(app):
     assert app.post_json('/validate', {
         'title': 'Hunky Dory',
@@ -25,3 +30,7 @@ def test_marshal_integration(app):
         'title': 'Hunky Dory',
         'release_date': '1971-12-17',
     }
+
+
+def test_spec(app):
+    print(app.get('/swagger').text)

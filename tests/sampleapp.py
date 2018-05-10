@@ -7,13 +7,25 @@ from pyramid.config import Configurator
 from pyramid.response import Response
 
 
-def hello_world(request):
-    return Response('Hello World!')
-
-
 class AlbumSchema(Schema):
     title = fields.Str()
     release_date = fields.Date()
+
+
+class Root(dict):
+    def __init__(self, request):
+        super().__init__({
+            'traversal': Traversal(request),
+        })
+
+
+class Traversal(dict):
+    def __init__(self, request):
+        super().__init__()
+
+
+def hello_world(request):
+    return Response('Hello World!')
 
 
 def validate(request):
@@ -32,9 +44,8 @@ def marshal(request):
 
 
 @pytest.fixture(scope='session')
-def wsgi():
-    settings = {}
-    with Configurator(settings=settings) as config:
+def config():
+    with Configurator(settings={}) as config:
         config.include('pyramid_apispec')
 
         # Hello world
@@ -45,6 +56,7 @@ def wsgi():
         config.add_route('validate', '/validate')
         config.add_view(
             validate, route_name='validate', validate=AlbumSchema(),
+            request_method=('GET', 'POST'),
         )
 
         # Marshaller
@@ -54,9 +66,22 @@ def wsgi():
             renderer='json',
         )
 
-        return config.make_wsgi_app()
+        # Traversal
+        config.set_root_factory(Root)
+        config.add_view(hello_world, context=Traversal, name='hello')
+        config.add_view(
+            validate, context=Traversal, name='validate',
+            validate=AlbumSchema(),
+        )
+        config.add_view(
+            marshal, context=Traversal, name='marshal', marshal=AlbumSchema(),
+            renderer='json',
+        )
+
+        return config
 
 
 @pytest.fixture(scope='session')
-def app(wsgi):
+def app(config):
+    wsgi = config.make_wsgi_app()
     return TestApp(wsgi)

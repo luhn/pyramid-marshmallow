@@ -1,6 +1,7 @@
 from marshmallow import Schema
 from pyramid.viewderivers import VIEW
 
+from .spec import create_spec
 from .exceptions import SchemaError, ValidationError, MarshalError
 
 
@@ -12,8 +13,16 @@ __all__ = [
 
 
 def includeme(config):
+    # Stop introspecting, temporarily
+    introspection = getattr(config, 'introspection', True)
+    config.introspection = False
+
     config.add_view_deriver(view_validator)
     config.add_view_deriver(view_marshaller, under='rendered_view', over=VIEW)
+    config.add_route('swagger', '/swagger')
+    config.add_view(swagger, route_name='swagger', renderer='json')
+
+    config.introspection = introspection
 
 
 def _make_schema(schema):
@@ -27,7 +36,7 @@ def _make_schema(schema):
     elif isinstance(schema, Schema):
         return schema
     elif isinstance(schema, dict):
-        _Schema = type('Schema', (Schema,), schema)
+        _Schema = type('_Schema', (Schema,), schema)
         return _Schema()
     else:
         raise TypeError('Schema is of invalid type.')
@@ -71,3 +80,9 @@ def view_marshaller(view, info):
 
 
 view_marshaller.options = ('marshal',)
+
+
+def swagger(context, request):
+    introspector = request.registry.introspector
+    spec = create_spec(introspector)
+    return spec.to_dict()
