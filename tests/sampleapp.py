@@ -9,7 +9,7 @@ from pyramid.response import Response
 
 class AlbumSchema(Schema):
     title = fields.Str()
-    release_date = fields.Date()
+    release_date = fields.Date(allow_null=True)
 
 
 class Root(dict):
@@ -43,6 +43,21 @@ def marshal(request):
     }
 
 
+def list(request):
+    return {
+        'items': [
+            {
+                'title': 'Hunky Dory',
+                'release_date': Date(1971, 12, 17),
+            },
+            {
+                'title': 'Spiders From Mars',
+                'release_date': Date(1973, 11, 10),
+            },
+        ],
+    }
+
+
 @pytest.fixture(scope='session')
 def config():
     with Configurator(settings={}) as config:
@@ -63,6 +78,18 @@ def config():
         config.add_route('marshal', '/marshal')
         config.add_view(
             marshal, route_name='marshal', marshal=AlbumSchema(),
+            renderer='json',
+        )
+
+        # List
+        config.add_route('list', '/list')
+        config.add_view(
+            list,
+            route_name='list',
+            marshal={
+                'items': fields.Nested(AlbumSchema(), many=True),
+                'whatever': fields.Str(),
+            },
             renderer='json',
         )
 

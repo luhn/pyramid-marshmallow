@@ -43,6 +43,7 @@ def _make_schema(schema):
 
 
 def view_validator(view, info):
+    print(info.original_view, id(info.options.get('validate')))
     schema = _make_schema(info.options.get('validate'))
     if schema is None:
         return view

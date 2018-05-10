@@ -25,9 +25,13 @@ def make_path(introspector, introspectable):
 
 
 def add_definition(spec, schema):
-    name = type(schema).__name__
-    spec.definition(name, schema=schema)
-    return {'$ref': '#/definitions/{}'.format(name)}
+    if isinstance(schema, dict):
+        from pyramid_apispec import _make_schema
+        return _make_schema(schema)
+    else:
+        name = type(schema).__name__
+        spec.definition(name, schema=schema)
+        return schema
 
 
 def create_spec(introspector):
@@ -48,6 +52,7 @@ def create_spec(introspector):
                     'schema': add_definition(spec, view['validate']),
                 }]
             if 'marshal' in view:
+                print(path, id(view['marshal']))
                 op['responses'] = {
                     '200': {
                         'description': 'Some response',
