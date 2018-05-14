@@ -38,31 +38,40 @@ def create_spec(introspector):
     spec = APISpec(
         title='Test',
         version='0.1.0',
+        openapi_version='3.0.1',
         plugins=['apispec.ext.marshmallow'],
     )
     for path, operations in list_paths(introspector).items():
         final_ops = dict()
         for method, view in operations.items():
-            op = final_ops.setdefault(method, dict())
-            if 'validate' in view:
-                op['parameters'] = [{
-                    'in': 'body',
-                    'name': 'body',
-                    'required': True,
-                    'schema': add_definition(spec, view['validate']),
-                }]
+            op = final_ops.setdefault(method, {
+                'responses': {},
+            })
+            docstring = (view['callable'].__doc__ or '').strip()
+            if docstring:
+                op['description'] = docstring
+            if 'validate' in view and method != 'get':
+                schema = add_definition(spec, view['validate'])
+                op['requestBody'] = {
+                    'content': {
+                        'application/json': {
+                            'schema': schema,
+                        },
+                    },
+                }
             if 'marshal' in view:
-                op['responses'] = {
-                    '200': {
-                        'description': 'Some response',
-                        'schema': add_definition(spec, view['marshal']),
+                schema = add_definition(spec, view['marshal'])
+                op['responses']['200'] = {
+                    'description': '',
+                    'content': {
+                        'application/json': {
+                            'schema': schema,
+                        },
                     },
                 }
             else:
-                op['responses'] = {
-                    '200': {
-                        'description': 'Unknown',
-                    },
+                op['responses']['200'] = {
+                    'description': '',
                 }
         spec.add_path(path, operations=final_ops)
     return spec

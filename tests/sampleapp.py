@@ -8,6 +8,10 @@ from pyramid.response import Response
 
 
 class AlbumSchema(Schema):
+    """
+    Information about an album.
+
+    """
     title = fields.Str()
     release_date = fields.Date(allow_null=True)
 
@@ -37,6 +41,10 @@ def validate(request):
 
 
 def marshal(request):
+    """
+    Returns JSON-serialized information about the album.
+
+    """
     return {
         'title': 'Hunky Dory',
         'release_date': Date(1971, 12, 17),
