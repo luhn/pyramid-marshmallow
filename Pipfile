@@ -4,12 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-
 marshmallow = "*"
 pyramid = "*"
+apispec = "*"
 
 [dev-packages]
-
 webtest = "*"
 pytest = "*"
 "flake8" = "*"
