@@ -25,7 +25,7 @@ def includeme(config):
     config.introspection = introspection
 
 
-def _make_schema(schema):
+def make_schema(schema):
     """
     If passed a schema, nothing happens.  If passed a dictionary, create a
     schema for one-time use.
@@ -43,7 +43,7 @@ def _make_schema(schema):
 
 
 def view_validator(view, info):
-    schema = _make_schema(info.options.get('validate'))
+    schema = make_schema(info.options.get('validate'))
     if schema is None:
         return view
 
@@ -65,7 +65,7 @@ view_validator.options = ('validate',)
 
 
 def view_marshaller(view, info):
-    schema = _make_schema(info.options.get('marshal'))
+    schema = make_schema(info.options.get('marshal'))
     if schema is None:
         return view
 

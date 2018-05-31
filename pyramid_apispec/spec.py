@@ -27,8 +27,8 @@ def make_path(introspector, introspectable):
 
 def add_definition(spec, schema):
     if isinstance(schema, dict):
-        from pyramid_apispec import _make_schema
-        return _make_schema(schema)
+        from pyramid_apispec import make_schema
+        return make_schema(schema)
     else:
         name = type(schema).__name__
         spec.definition(name, schema=schema)

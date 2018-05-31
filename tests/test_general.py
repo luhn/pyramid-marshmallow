@@ -1,6 +1,6 @@
 from datetime import date as Date
 from marshmallow import Schema, fields
-from pyramid_apispec import _make_schema
+from pyramid_apispec import make_schema
 
 
 class AlbumSchema(Schema):
@@ -9,16 +9,16 @@ class AlbumSchema(Schema):
 
 
 def test_make_schema_null():
-    assert _make_schema(None) is None
+    assert make_schema(None) is None
 
 
 def test_make_schema_schema():
     schema = AlbumSchema()
-    assert _make_schema(schema) is schema
+    assert make_schema(schema) is schema
 
 
 def test_make_schema_dict():
-    schema = _make_schema({
+    schema = make_schema({
         'title': fields.Str(),
         'release_date': fields.Date(),
     })
