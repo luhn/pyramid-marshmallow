@@ -3,26 +3,35 @@ from apispec import APISpec, utils
 
 
 def list_paths(introspector):
-    paths = dict()
     for item in introspector.get_category('views'):
         spect = item['introspectable']
-        path = make_path(introspector, spect)
+        path, params = make_path(introspector, spect)
         if path is None:
             continue
-        operations = paths.setdefault(path, dict())
+        operations = dict()
         for method in (spect['request_methods'] or ['GET']):
             method = method.lower()
             operations[method] = spect
-    return paths
+        yield path, params, operations
 
 
 def make_path(introspector, introspectable):
     if introspectable['route_name']:
         route = introspector.get('routes', introspectable['route_name'])
-        return route['pattern']
+        return route['pattern'], []
+    elif introspectable['context']:
+        context = introspectable['context']
+        base = getattr(context, '__path__', None)
+        if not base:
+            return None, []
+        path = base + '/' + (introspectable['name'] or '')
+        params = getattr(context, '__params__', [])
+        for param in params:
+            param['in'] = 'path'
+            param['required'] = True
+        return path, params
     else:
-        # key = ('traversal', spect['context'], spect['name'])
-        return None
+        return None, []
 
 
 def add_definition(spec, schema):
@@ -66,12 +75,13 @@ def create_spec(title, version, introspector):
         openapi_version='3.0.1',
         plugins=['apispec.ext.marshmallow'],
     )
-    for path, operations in list_paths(introspector).items():
+    for path, params, operations in list_paths(introspector):
         final_ops = dict()
         for method, view in operations.items():
             docstring, op = split_docstring(view['callable'].__doc__)
             op.setdefault('responses', dict())
             op.setdefault('description', docstring)
+            op.setdefault('parameters', []).extend(params)
             if 'validate' in view and method != 'get':
                 schema = add_definition(spec, view['validate'])
                 op['requestBody'] = {

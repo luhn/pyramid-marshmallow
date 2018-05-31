@@ -19,13 +19,35 @@ class AlbumSchema(Schema):
 class Root(dict):
     def __init__(self, request):
         super().__init__({
-            'traversal': Traversal(request),
+            'album': AlbumContainer(request),
         })
 
 
-class Traversal(dict):
+class AlbumContainer(dict):
+    __path__ = '/album'
+
     def __init__(self, request):
+        self.request = request
         super().__init__()
+
+    def __getitem__(self, key):
+        if val.isdigit():
+            return Album(self.request, int(key))
+        return super().__getitem__(key)
+
+
+class Album(dict):
+    __path__ = '/album/{albumId}'
+    __params__ = [{
+        'name': 'albumId',
+        'description': 'The ID of the album.',
+        'schema': {
+            'type': 'integer',
+        },
+    }]
+
+    def __init__(self, request, album_id):
+        self.album_id = album_id
 
 
 def hello_world(request):
@@ -115,19 +137,15 @@ def config():
             renderer='json',
         )
 
-        # Like
-        config.add_route('like', '/like')
-        config.add_view(like, route_name='like')
-
         # Traversal
         config.set_root_factory(Root)
-        config.add_view(hello_world, context=Traversal, name='hello')
+        config.add_view(like, context=Album, name='like')
         config.add_view(
-            validate, context=Traversal, name='validate',
+            validate, context=Album, name='validate',
             validate=AlbumSchema(),
         )
         config.add_view(
-            marshal, context=Traversal, name='marshal', marshal=AlbumSchema(),
+            marshal, context=Album, name='marshal', marshal=AlbumSchema(),
             renderer='json',
         )
 
