@@ -51,7 +51,7 @@ def marshal(request):
     }
 
 
-def list(request):
+def list():
     return {
         'items': [
             {
@@ -64,6 +64,20 @@ def list(request):
             },
         ],
     }
+
+
+def like():
+    """
+    Indicate that you like an album.
+
+    ---
+    responses:
+        204:
+            description: |
+                Indicates that the like was successfully recorded.
+
+    """
+    return HTTPNoContent()
 
 
 @pytest.fixture(scope='session')
@@ -95,11 +109,15 @@ def config():
             list,
             route_name='list',
             marshal={
-                'items': fields.Nested(AlbumSchema(), many=True),
-                'whatever': fields.Str(),
+                'items': fields.Nested(AlbumSchema(many=True)),
+                'whatever': fields.Str(allow_none=True),
             },
             renderer='json',
         )
+
+        # Like
+        config.add_route('like', '/like')
+        config.add_view(like, route_name='like')
 
         # Traversal
         config.set_root_factory(Root)
