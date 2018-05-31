@@ -83,6 +83,9 @@ view_marshaller.options = ('marshal',)
 
 
 def swagger(context, request):
+    settings = request.registry.settings
     introspector = request.registry.introspector
-    spec = create_spec(introspector)
+    title = settings.get('openapi.title', 'Untitled')
+    version = settings.get('openapi.version', '1.0.0')
+    spec = create_spec(title, version, introspector)
     return spec.to_dict()

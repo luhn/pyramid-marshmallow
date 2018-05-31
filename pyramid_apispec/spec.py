@@ -59,10 +59,10 @@ def split_docstring(docstring):
     return docs, parsed
 
 
-def create_spec(introspector):
+def create_spec(title, version, introspector):
     spec = APISpec(
-        title='Test',
-        version='0.1.0',
+        title=title,
+        version=version,
         openapi_version='3.0.1',
         plugins=['apispec.ext.marshmallow'],
     )
