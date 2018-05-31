@@ -49,7 +49,7 @@ def view_validator(view, info):
 
     def wrapped(context, request):
         if request.method == 'GET':
-            data = dict(request.GET)
+            data = request.GET.mixed()
         else:
             data = request.json_body
         result = schema.load(data)

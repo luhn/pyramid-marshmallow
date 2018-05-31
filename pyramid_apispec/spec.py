@@ -91,6 +91,12 @@ def create_spec(title, version, introspector):
                         },
                     },
                 }
+            elif 'validate' in view:
+                schema = add_definition(spec, view['validate'])
+                op['parameters'].append({
+                    'in': 'query',
+                    'schema': schema,
+                })
             if 'marshal' in view:
                 schema = add_definition(spec, view['marshal'])
                 op['responses']['200'] = {

@@ -4,6 +4,7 @@ from setuptools import setup, find_packages
 REQUIRES = [
     'pyramid>=1.7,<2',
     'marshmallow>=2.0,<3',
+    'apispec>=0.37,<0.38',
 ]
 
 
