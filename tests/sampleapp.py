@@ -5,6 +5,7 @@ from marshmallow import Schema, fields
 
 from pyramid.config import Configurator
 from pyramid.response import Response
+from pyramid.httpexceptions import HTTPNoContent
 
 
 class AlbumSchema(Schema):
@@ -31,7 +32,7 @@ class AlbumContainer(dict):
         super().__init__()
 
     def __getitem__(self, key):
-        if val.isdigit():
+        if key.isdigit():
             return Album(self.request, int(key))
         return super().__getitem__(key)
 
