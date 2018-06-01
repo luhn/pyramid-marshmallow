@@ -106,6 +106,23 @@ def set_url_params(spec, op, view):
     op['parameters'].extend(params)
 
 
+def set_tag(spec, op, view):
+    context = view['context']
+    if not context:
+        return
+    tag = getattr(context, '__tag__', None)
+    if not tag:
+        return
+    if isinstance(tag, dict):
+        # Cheating and using the private variable spec._tags
+        if not any(x['name'] == tag['name'] for x in spec._tags):
+            spec.add_tag(tag)
+        tag_name = tag['name']
+    else:
+        tag_name = tag
+    op.setdefault('tags', []).append(tag_name)
+
+
 def create_spec(title, version, introspector):
     spec = APISpec(
         title=title,
@@ -127,6 +144,7 @@ def create_spec(title, version, introspector):
                 set_query_params(spec, op, view)
             if 'marshal' in view:
                 set_response_body(spec, op, view)
+            set_tag(spec, op, view)
             # We are required to have some response, so make one up.
             if not op['responses']:
                 op['responses']['200'] = {

@@ -46,6 +46,10 @@ class Album(dict):
             'type': 'integer',
         },
     }]
+    __tag__ = {
+        'name': 'album',
+        'description': 'A collection of songs.',
+    }
 
     def __init__(self, request, album_id):
         self.album_id = album_id
