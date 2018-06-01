@@ -5,33 +5,29 @@ from apispec import APISpec, utils
 def list_paths(introspector):
     for item in introspector.get_category('views'):
         spect = item['introspectable']
-        path, params = make_path(introspector, spect)
+        path = make_path(introspector, spect)
         if path is None:
             continue
         operations = dict()
         for method in (spect['request_methods'] or ['GET']):
             method = method.lower()
             operations[method] = spect
-        yield path, params, operations
+        yield path, operations
 
 
 def make_path(introspector, introspectable):
     if introspectable['route_name']:
         route = introspector.get('routes', introspectable['route_name'])
-        return route['pattern'], []
+        return route['pattern']
     elif introspectable['context']:
         context = introspectable['context']
         base = getattr(context, '__path__', None)
         if not base:
-            return None, []
-        path = base + '/' + (introspectable['name'] or '')
-        params = getattr(context, '__params__', [])
-        for param in params:
-            param['in'] = 'path'
-            param['required'] = True
-        return path, params
+            return None
+        else:
+            return base + '/' + (introspectable['name'] or '')
     else:
-        return None, []
+        return None
 
 
 def add_definition(spec, schema):
@@ -68,6 +64,48 @@ def split_docstring(docstring):
     return docs, parsed
 
 
+def set_request_body(spec, op, view):
+    schema = add_definition(spec, view['validate'])
+    op['requestBody'] = {
+        'content': {
+            'application/json': {
+                'schema': schema,
+            },
+        },
+    }
+
+
+def set_query_params(spec, op, view):
+    schema = add_definition(spec, view['validate'])
+    op['parameters'].append({
+        'in': 'query',
+        'schema': schema,
+    })
+
+
+def set_response_body(spec, op, view):
+    schema = add_definition(spec, view['marshal'])
+    op['responses']['200'] = {
+        'description': '',
+        'content': {
+            'application/json': {
+                'schema': schema,
+            },
+        },
+    }
+
+
+def set_url_params(spec, op, view):
+    context = view['context']
+    if not context:
+        return
+    params = getattr(context, '__params__', [])
+    for param in params:
+        param['in'] = 'path'
+        param['required'] = True
+    op['parameters'].extend(params)
+
+
 def create_spec(title, version, introspector):
     spec = APISpec(
         title=title,
@@ -75,38 +113,20 @@ def create_spec(title, version, introspector):
         openapi_version='3.0.1',
         plugins=['apispec.ext.marshmallow'],
     )
-    for path, params, operations in list_paths(introspector):
+    for path, operations in list_paths(introspector):
         final_ops = dict()
         for method, view in operations.items():
             docstring, op = split_docstring(view['callable'].__doc__)
             op.setdefault('responses', dict())
             op.setdefault('description', docstring)
-            op.setdefault('parameters', []).extend(params)
+            op.setdefault('parameters', [])
+            set_url_params(spec, op, view)
             if 'validate' in view and method != 'get':
-                schema = add_definition(spec, view['validate'])
-                op['requestBody'] = {
-                    'content': {
-                        'application/json': {
-                            'schema': schema,
-                        },
-                    },
-                }
+                set_request_body(spec, op, view)
             elif 'validate' in view:
-                schema = add_definition(spec, view['validate'])
-                op['parameters'].append({
-                    'in': 'query',
-                    'schema': schema,
-                })
+                set_query_params(spec, op, view)
             if 'marshal' in view:
-                schema = add_definition(spec, view['marshal'])
-                op['responses']['200'] = {
-                    'description': '',
-                    'content': {
-                        'application/json': {
-                            'schema': schema,
-                        },
-                    },
-                }
+                set_response_body(spec, op, view)
             # We are required to have some response, so make one up.
             if not op['responses']:
                 op['responses']['200'] = {
