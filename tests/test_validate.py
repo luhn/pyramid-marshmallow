@@ -4,6 +4,7 @@ from types import SimpleNamespace
 from marshmallow import Schema, fields
 from datetime import date as Date
 from pyramid.testing import DummyRequest
+from webob.multidict import MultiDict
 
 from pyramid_apispec import view_validator, ValidationError
 
@@ -51,10 +52,10 @@ def test_validate(wrapped, view):
 def test_validate_get(wrapped, view):
     request = DummyRequest()
     request.method = 'GET'
-    request.GET = {
+    request.GET = MultiDict({
         'title': 'Hunky Dory',
         'release_date': '1971-12-17',
-    }
+    })
     context = object()
     wrapped(context, request)
     view.assert_called_once_with(context, request)

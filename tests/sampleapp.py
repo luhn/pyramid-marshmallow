@@ -26,6 +26,10 @@ class Root(dict):
 
 class AlbumContainer(dict):
     __path__ = '/album'
+    __tag__ = {
+        'name': 'album',
+        'description': 'A collection of songs.',
+    }
 
     def __init__(self, request):
         self.request = request
@@ -46,10 +50,7 @@ class Album(dict):
             'type': 'integer',
         },
     }]
-    __tag__ = {
-        'name': 'album',
-        'description': 'A collection of songs.',
-    }
+    __tag__ = 'album'
 
     def __init__(self, request, album_id):
         self.album_id = album_id
@@ -144,6 +145,7 @@ def config():
 
         # Traversal
         config.set_root_factory(Root)
+        config.add_view(hello_world, context=AlbumContainer, name='hello')
         config.add_view(like, context=Album, name='like')
         config.add_view(
             validate, context=Album, name='validate',

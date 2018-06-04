@@ -7,7 +7,7 @@ def test_hello_world(app):
 
 
 def test_traversal_hello(app):
-    r = app.get('/traversal/hello')
+    r = app.get('/album/hello')
     assert r.text == 'Hello World!'
 
 
