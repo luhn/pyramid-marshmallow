@@ -9,7 +9,10 @@ def list_paths(introspector):
         if path is None:
             continue
         operations = dict()
-        for method in (spect['request_methods'] or ['GET']):
+        methods = spect['request_methods'] or ['GET']
+        if isinstance(methods, str):
+            methods = [methods]
+        for method in methods:
             method = method.lower()
             operations[method] = spect
         yield path, operations
