@@ -13,10 +13,15 @@ setup(
     version='0.2.0',
     description='TODO',
     long_description=open('README.rst').read(),
+    license='MIT',
     author='Theron Luhn',
     author_email='theron@luhn.com',
     url='https://github.com/luhn/pyramid-apispec',
     packages=find_packages(),
     install_requires=REQUIRES,
-    license='MIT',
+    entry_points={
+        'console_scripts': [
+            'generate-apispec=pyramid_apispec.scripts:generate',
+        ],
+    },
 )

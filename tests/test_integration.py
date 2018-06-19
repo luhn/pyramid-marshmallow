@@ -30,7 +30,3 @@ def test_marshal_integration(app):
         'title': 'Hunky Dory',
         'release_date': '1971-12-17',
     }
-
-
-def test_spec(app):
-    print(app.get('/swagger').text)

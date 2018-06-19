@@ -13,16 +13,8 @@ __all__ = [
 
 
 def includeme(config):
-    # Stop introspecting, temporarily
-    introspection = getattr(config, 'introspection', True)
-    config.introspection = False
-
     config.add_view_deriver(view_validator)
     config.add_view_deriver(view_marshaller, under='rendered_view', over=VIEW)
-    config.add_route('swagger', '/swagger')
-    config.add_view(swagger, route_name='swagger', renderer='json')
-
-    config.introspection = introspection
 
 
 def make_schema(schema):
@@ -80,12 +72,3 @@ def view_marshaller(view, info):
 
 
 view_marshaller.options = ('marshal',)
-
-
-def swagger(context, request):
-    settings = request.registry.settings
-    introspector = request.registry.introspector
-    title = settings.get('openapi.title', 'Untitled')
-    version = settings.get('openapi.version', '1.0.0')
-    spec = create_spec(title, version, introspector)
-    return spec.to_dict()
