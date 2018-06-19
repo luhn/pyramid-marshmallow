@@ -16,10 +16,20 @@ def includeme(config):
     config.add_view_deriver(view_marshaller, under='rendered_view', over=VIEW)
 
 
-def make_schema(schema):
+def make_schema(schema=None, **kwargs):
     """
-    If passed a schema, nothing happens.  If passed a dictionary, create a
-    schema for one-time use.
+    Create a schema from a dictionary.
+
+    """
+    if schema is None:
+        schema = kwargs
+    return type('_Schema', (Schema,), schema.copy())
+
+
+def process_schema(schema):
+    """
+    Handle a schema passed in as a view deriver, creating a nonce schema if a
+    dictionary.
 
     """
     if schema is None:
@@ -27,14 +37,14 @@ def make_schema(schema):
     elif isinstance(schema, Schema):
         return schema
     elif isinstance(schema, dict):
-        _Schema = type('_Schema', (Schema,), schema.copy())
+        _Schema = make_schema(schema)
         return _Schema()
     else:
         raise TypeError('Schema is of invalid type.')
 
 
 def view_validator(view, info):
-    schema = make_schema(info.options.get('validate'))
+    schema = process_schema(info.options.get('validate'))
     if schema is None:
         return view
 
@@ -56,7 +66,7 @@ view_validator.options = ('validate',)
 
 
 def view_marshaller(view, info):
-    schema = make_schema(info.options.get('marshal'))
+    schema = process_schema(info.options.get('marshal'))
     if schema is None:
         return view
 
