@@ -18,6 +18,9 @@ setup(
     author_email='theron@luhn.com',
     url='https://github.com/luhn/pyramid-apispec',
     packages=find_packages(),
+    package_data={
+        'pyramid_apispec': ['assets/*'],
+    },
     install_requires=REQUIRES,
     entry_points={
         'console_scripts': [

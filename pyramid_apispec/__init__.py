@@ -1,7 +1,6 @@
 from marshmallow import Schema
 from pyramid.viewderivers import VIEW
 
-from .spec import create_spec
 from .exceptions import SchemaError, ValidationError, MarshalError
 
 
