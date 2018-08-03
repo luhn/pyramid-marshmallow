@@ -71,7 +71,7 @@ def process_define(spec):
 
     """
     for schema in to_define:
-        add_definition(spec, schema)
+        add_definition(spec, schema())
 
 
 def split_docstring(docstring):

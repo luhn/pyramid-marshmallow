@@ -10,7 +10,7 @@ REQUIRES = [
 
 setup(
     name='pyramid-apispec',
-    version='0.3.1',
+    version='0.3.2',
     description='TODO',
     long_description=open('README.rst').read(),
     license='MIT',
