@@ -1,6 +1,6 @@
+from marshmallow import Schema
 import yaml
 from apispec import APISpec, utils
-from . import make_schema
 
 
 def list_paths(introspector):
@@ -34,6 +34,16 @@ def make_path(introspector, introspectable):
         return None
 
 
+def make_schema(schema=None, **kwargs):
+    """
+    Create a schema from a dictionary.
+
+    """
+    if schema is None:
+        schema = kwargs
+    return type('_Schema', (Schema,), schema.copy())
+
+
 def add_definition(spec, schema):
     if isinstance(schema, dict):
         return make_schema(schema)
@@ -41,6 +51,27 @@ def add_definition(spec, schema):
         name = type(schema).__name__
         spec.definition(name, schema=schema)
         return schema
+
+
+to_define = []
+
+
+def define(schema):
+    """
+    Mark a schema to be defined in the spec.
+
+    """
+    to_define.append(schema)
+    return schema
+
+
+def process_define(spec):
+    """
+    Add pending schema.
+
+    """
+    for schema in to_define:
+        add_definition(spec, schema)
 
 
 def split_docstring(docstring):
@@ -155,4 +186,6 @@ def create_spec(title, version, introspector):
                 }
             final_ops[method] = op
         spec.add_path(path, operations=final_ops)
+
+    process_define(spec)
     return spec

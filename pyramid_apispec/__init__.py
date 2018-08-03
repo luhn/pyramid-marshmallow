@@ -2,28 +2,21 @@ from marshmallow import Schema
 from pyramid.viewderivers import VIEW
 
 from .exceptions import SchemaError, ValidationError, MarshalError
+from .spec import make_schema, define
 
 
 __all__ = [
     'SchemaError',
     'ValidationError',
     'MarshalError',
+    'make_schema',
+    'define',
 ]
 
 
 def includeme(config):
     config.add_view_deriver(view_validator)
     config.add_view_deriver(view_marshaller, under='rendered_view', over=VIEW)
-
-
-def make_schema(schema=None, **kwargs):
-    """
-    Create a schema from a dictionary.
-
-    """
-    if schema is None:
-        schema = kwargs
-    return type('_Schema', (Schema,), schema.copy())
 
 
 def process_schema(schema):
