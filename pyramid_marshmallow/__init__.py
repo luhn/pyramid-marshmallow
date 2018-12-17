@@ -43,7 +43,9 @@ def view_validator(view, info):
 
     def wrapped(context, request):
         if request.method == 'GET':
-            data = request.GET.mixed()
+            data = dict()
+            for k, v in request.GET.items():
+                data[k] = v
         else:
             data = request.json_body
         result = schema.load(data)

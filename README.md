@@ -13,8 +13,9 @@ Activate it by adding `config.include('pyramid_marshmallow')` into your config
 function or adding `pyramid.includes = pyramid_marshmallow` into your ini file.
 
 To validate incoming data, set `validate` to a Marshmallow schema in your
-`view_config`.  The deserialized data (i.e. the output of `Schema.load`) is
-placed in `request.data`.
+`view_config`.  The request body is parsed as JSON then passed through the
+schema's `load` function.  You can access the processed data with
+`request.data`.
 
 ```python
 from marshmallow import Schema, String
@@ -35,6 +36,9 @@ def hello(context, request):
         request.data['name']
     ))
 ```
+
+For GET requests, the URL parameters are passed into the schema.  Value lists
+are not currently supported.
 
 Setting `marshal` in your `view_config` will run the view output through
 marshmallow (i.e. `Schema.dump`) before going to the renderer.  You probably
