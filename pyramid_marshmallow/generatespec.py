@@ -9,22 +9,13 @@ from pyramid.paster import get_app
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    'format',
-    help='The output, one of "json", "yaml", or "zip".',
-)
-parser.add_argument(
     'ini',
     help='The .ini config file for the Pyramid project.',
 )
 parser.add_argument(
-    '--title',
-    default='Untitled',
-    help='The title for the spec.',
-)
-parser.add_argument(
-    '--version',
-    default='1.0.0',
-    help='The version for the spec.',
+    '--format',
+    help='The output, one of "json", "yaml", or "zip".',
+    default='json',
 )
 parser.add_argument(
     '--output',
@@ -37,8 +28,11 @@ def generate():
     from .spec import create_spec
     args = parser.parse_args()
     app = get_app(args.ini)
+    settings = app.registry.settings
+    title = settings.get('openapi.title', 'Untitled')
+    version = settings.get('openapi.version', '0.0.0')
     introspector = app.registry.introspector
-    spec = create_spec(args.title, args.version, introspector)
+    spec = create_spec(title, version, introspector)
     if args.format == 'json':
         output = json.dumps(spec.to_dict())
     elif args.format == 'yaml':
@@ -67,3 +61,7 @@ def generate_zip(spec):
         with zipfile.ZipFile(fh, 'a') as zip:
             zip.writestr('swagger.json', swaggerjson)
         return fh.getvalue()
+
+
+if __name__ == '__main__':
+    generate()

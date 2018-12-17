@@ -305,10 +305,10 @@ version = "4.6.0"
 setuptools = "*"
 
 [extras]
-apispec = ["apispec"]
+openapi = ["apispec", "PyYAML"]
 
 [metadata]
-content-hash = "5ad667478a8eb75f6ad1c0fb81017dca7274d232b9584a02727535e5f1802839"
+content-hash = "cdf25c5278e0ade4b518731721357860b4e81c88e95276e15ecdd6c9d981da93"
 python-versions = "^3.4"
 
 [metadata.hashes]

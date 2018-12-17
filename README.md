@@ -81,7 +81,7 @@ You can also get a schema made from a dictionary by using the
 fields.
 
 
-## Error handling
+### Error handling
 
 If the validation fails, a `pyramid_marshmallow.ValidationError` is raised.
 The `errors` property of the exception contains a dictionary of error messages,
@@ -106,3 +106,106 @@ A failure during marshalling will result in a
 `pyramid_marshmallow.MarshalError` which behaves in the same manner.  It's
 usually less useful to attach a view to that exception, since marshalling
 errors are usually not encountered during standard operation.
+
+## OpenAPI
+
+By adding validation and marshalling to your views, we have the opportunity to
+utilize that data to generate documentation.  pyramid-marshmallow includes an
+utility that uses [apispec](https://apispec.readthedocs.io/en/stable/) to
+generate an [OpenAPI](https://swagger.io/resources/open-api/) specification for
+your application.
+
+First, you'll need to install some extra dependencies.
+
+```bash
+pip install pyramid-marshmallow[openapi]
+```
+
+Now you can generate your spec by simply passing in an ini file.
+pyramid-marshmallow needs to run your application in order to inspect it, so
+the ini file should contain all the necessary configuration to do so.
+
+```bash
+generate-spec development.ini
+```
+
+This will output the spec to stdout as JSON.  You can set the `--output` flag
+to output the results to a file.
+
+You can set `--format yaml` to output the spec as YAML instead or
+`--format zip` to output a zip file containing the spec and
+[Swagger UI](https://swagger.io/tools/swagger-ui/), a web interface for viewing
+the spec.
+
+By default, your spec will be titled "Untitled" and versioned "0.1.0".  You can
+change this by setting `openapi.title` and `openapi.version` in your ini file.
+
+### Additional Documentation
+
+To add additional documentation to schema fields, you can set the `description`
+property.
+
+```python
+class Hello(Schema):
+    name = String(required=True, description='Your first and last name.')
+```
+
+Documentation for the endpoint will be pulled from the view callable's
+docstring.
+
+You can also augment the spec by adding a line of three hyphens followed by
+YAML.  The YAML will be parsed and merged into to the endpoint's spec.  This
+can be useful for documenting endpoints that cannot be validated or marshalled,
+such as endpoints that return an empty body.
+
+```python
+@view_config(
+    context=WidgetResource,
+    method='post',
+    validate=WidgetSchema(),
+)
+def create_widget(context, request):
+    """
+    Create a new widget.
+    ---
+    responses:
+        201:
+            description: Indicates the widget was successfully created.
+    """
+    create_widget()
+    return HTTPCreated()
+```
+
+## URL Traversal
+
+If you're using Pyramid's URL traversal, the generated spec may be mostly
+empty.  This is because pyramid-marshmallow has no way of knowing where in the
+resource tree a resource is.  You can denote this by setting the `__path__`
+property on each resource.
+
+```python
+class Widget(Resource):
+    __path__ = '/widget'
+```
+
+Views attached to this resource will then be added to the spec.
+
+You can add parameters to your path via the `__params__` property.  You can
+also tag all attached views via `__tag__`.  Once you define a tag in one
+resource, you can use it elsewhere by setting `__tag__` to the tag name.
+
+```python
+class Widget(Resource):
+    __path__ = '/widget/{widgetId}'
+    __params__ = [{
+        'name': 'widgetId',
+        'schema': {
+            'type': 'integer',
+        },
+    }]
+    __tag__ = {
+        'name': 'widgets',
+        'description': 'Endpoints for managing a widget.',
+    }
+```
+

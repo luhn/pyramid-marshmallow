@@ -27,10 +27,10 @@ pytest = "^3.6"
 webtest = "^2.0"
 
 [tool.poetry.extras]
-apispec = ["apispec", "PyYAML"]
+openapi = ["apispec", "PyYAML"]
 
 [tool.poetry.scripts]
-generate-apispec = "pyramid_marshmallow.scripts:generate"
+generate-spec = "pyramid_marshmallow.generatespec:generate"
 
 [build-system]
 requires = ["poetry>=0.12"]

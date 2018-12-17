@@ -7,7 +7,7 @@ try:
 except ImportError:
     raise ImportError(
         'You must have the `apispec` package installed to use this feature.  '
-        'You can install it with `pip install pyramid_marshmallow[apispec].'
+        'You can install it with `pip install pyramid_marshmallow[openapi].'
     )
 
 
