@@ -6,7 +6,7 @@ from datetime import date as Date
 from pyramid.testing import DummyRequest
 from webob.multidict import MultiDict
 
-from pyramid_apispec import view_validator, ValidationError
+from pyramid_marshmallow import view_validator, ValidationError
 
 
 class AlbumSchema(Schema):

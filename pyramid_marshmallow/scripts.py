@@ -59,7 +59,7 @@ def generate():
 def generate_zip(spec):
     swaggerjson = json.dumps(spec.to_dict())
     src = pkg_resources.resource_stream(
-        'pyramid_apispec', 'assets/swagger-ui.zip',
+        'pyramid_marshmallow', 'assets/swagger-ui.zip',
     )
     with BytesIO() as fh:
         shutil.copyfileobj(src, fh)

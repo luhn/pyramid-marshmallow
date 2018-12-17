@@ -4,7 +4,7 @@ from types import SimpleNamespace
 from datetime import date as Date
 from marshmallow import Schema, fields
 
-from pyramid_apispec import view_marshaller, MarshalError
+from pyramid_marshmallow import view_marshaller, MarshalError
 
 
 class AlbumSchema(Schema):

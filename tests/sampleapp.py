@@ -111,7 +111,7 @@ def like():
 @pytest.fixture(scope='session')
 def config():
     with Configurator(settings={}) as config:
-        config.include('pyramid_apispec')
+        config.include('pyramid_marshmallow')
 
         # Hello world
         config.add_route('hello', '/hello')

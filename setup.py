@@ -9,22 +9,22 @@ REQUIRES = [
 
 
 setup(
-    name='pyramid-apispec',
-    version='0.3.2',
+    name='pyramid-marshmallow',
+    version='0.4.0',
     description='TODO',
     long_description=open('README.rst').read(),
     license='MIT',
     author='Theron Luhn',
     author_email='theron@luhn.com',
-    url='https://github.com/luhn/pyramid-apispec',
+    url='https://github.com/luhn/pyramid-marshmallow',
     packages=find_packages(),
     package_data={
-        'pyramid_apispec': ['assets/*'],
+        'pyramid_marshmallow': ['assets/*'],
     },
     install_requires=REQUIRES,
     entry_points={
         'console_scripts': [
-            'generate-apispec=pyramid_apispec.scripts:generate',
+            'generate-apispec=pyramid_marshmallow.scripts:generate',
         ],
     },
 )

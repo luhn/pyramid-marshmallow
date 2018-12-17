@@ -1,6 +1,6 @@
 from datetime import date as Date
 from marshmallow import Schema, fields
-from pyramid_apispec import make_schema, process_schema
+from pyramid_marshmallow import make_schema, process_schema
 
 
 class AlbumSchema(Schema):
