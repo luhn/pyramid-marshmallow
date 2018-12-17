@@ -2,7 +2,7 @@ from marshmallow import Schema
 from pyramid.viewderivers import VIEW
 
 from .exceptions import SchemaError, ValidationError, MarshalError
-from .spec import make_schema, define
+from .utils import make_schema, define
 
 
 __all__ = [

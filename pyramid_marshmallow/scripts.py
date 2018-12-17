@@ -5,7 +5,6 @@ import pkg_resources
 import argparse
 import json
 from pyramid.paster import get_app
-from .spec import create_spec
 
 
 parser = argparse.ArgumentParser()
@@ -35,6 +34,7 @@ parser.add_argument(
 
 
 def generate():
+    from .spec import create_spec
     args = parser.parse_args()
     app = get_app(args.ini)
     introspector = app.registry.introspector

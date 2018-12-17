@@ -1,6 +1,14 @@
 from marshmallow import Schema
-import yaml
-from apispec import APISpec, utils
+from .utils import make_schema, pending_definitions
+
+try:
+    from apispec import APISpec, utils
+    import yaml
+except ImportError:
+    raise ImportError(
+        'You must have the `apispec` package installed to use this feature.  '
+        'You can install it with `pip install pyramid_marshmallow[apispec].'
+    )
 
 
 def list_paths(introspector):
@@ -34,16 +42,6 @@ def make_path(introspector, introspectable):
         return None
 
 
-def make_schema(schema=None, **kwargs):
-    """
-    Create a schema from a dictionary.
-
-    """
-    if schema is None:
-        schema = kwargs
-    return type('_Schema', (Schema,), schema.copy())
-
-
 def add_definition(spec, schema):
     if isinstance(schema, dict):
         return make_schema(schema)
@@ -53,24 +51,12 @@ def add_definition(spec, schema):
         return schema
 
 
-to_define = []
-
-
-def define(schema):
-    """
-    Mark a schema to be defined in the spec.
-
-    """
-    to_define.append(schema)
-    return schema
-
-
 def process_define(spec):
     """
     Add pending schema.
 
     """
-    for schema in to_define:
+    for schema in pending_definitions():
         add_definition(spec, schema())
 
 

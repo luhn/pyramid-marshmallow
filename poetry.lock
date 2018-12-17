@@ -2,7 +2,7 @@
 category = "main"
 description = "A pluggable API specification generator. Currently supports the OpenAPI specification (f.k.a. the Swagger specification)."
 name = "apispec"
-optional = false
+optional = true
 python-versions = "*"
 version = "0.37.1"
 
@@ -215,7 +215,7 @@ version = ">=2.2.0"
 category = "main"
 description = "YAML parser and emitter for Python"
 name = "pyyaml"
-optional = false
+optional = true
 python-versions = "*"
 version = "3.13"
 
@@ -304,8 +304,11 @@ version = "4.6.0"
 [package.dependencies]
 setuptools = "*"
 
+[extras]
+apispec = ["apispec"]
+
 [metadata]
-content-hash = "4b3936d073825f5d54733062f75cdc0edef4803068af76e703db8e6ff92e9fd3"
+content-hash = "5ad667478a8eb75f6ad1c0fb81017dca7274d232b9584a02727535e5f1802839"
 python-versions = "^3.4"
 
 [metadata.hashes]

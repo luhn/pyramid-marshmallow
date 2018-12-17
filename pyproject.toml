@@ -14,14 +14,20 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.4"
-apispec = "^0.37"
 marshmallow = "^2.16"
 pyramid = "^1.7"
+
+# [apispec] extras
+apispec = {version = "^0.37", optional = true}
+PyYAML = {version = "^3.10", optional = true}
 
 [tool.poetry.dev-dependencies]
 "flake8" = "^3.5"
 pytest = "^3.6"
 webtest = "^2.0"
+
+[tool.poetry.extras]
+apispec = ["apispec", "PyYAML"]
 
 [tool.poetry.scripts]
 generate-apispec = "pyramid_marshmallow.scripts:generate"
