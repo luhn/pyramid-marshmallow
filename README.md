@@ -209,3 +209,15 @@ class Widget(Resource):
     }
 ```
 
+## Prior Art
+
+[pyramid-apispec](https://pypi.org/project/pyramid-apispec/) allows you to
+augment view callable docstrings with OpenAPI definitions and can reference
+Marshmallow schemas with the apispec Marshmallow plugin.  It does not support
+validating input and marshalling output.  Schemas and routes must be manually
+declared.
+
+[Cornice](https://cornice.readthedocs.io/en/latest/schema.html#using-marshmallow)
+supports validation with Marshmallow schemas, however only on Cornice
+resources, not arbitrary Pyramid endpoints.  It does not support
+auto-generating OpenAPI documentation.
