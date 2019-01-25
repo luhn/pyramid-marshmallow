@@ -34,7 +34,7 @@ def make_path(introspector, introspectable):
     elif introspectable['context']:
         context = introspectable['context']
         base = getattr(context, '__path__', None)
-        if not base:
+        if base is None:
             return None
         else:
             return base + '/' + (introspectable['name'] or '')
