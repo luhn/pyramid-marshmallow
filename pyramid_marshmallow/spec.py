@@ -1,5 +1,5 @@
 from marshmallow import Schema
-from .utils import make_schema, pending_definitions
+from .utils import make_schema
 
 try:
     from apispec import APISpec, utils
@@ -48,14 +48,6 @@ def add_definition(spec, schema):
         return make_schema(schema)
     else:
         return schema
-
-
-def process_define(spec):
-    """
-    Add pending schema.
-
-    """
-    pass
 
 
 def split_docstring(docstring):
@@ -171,5 +163,4 @@ def create_spec(title, version, introspector):
             final_ops[method] = op
         spec.path(path, operations=final_ops)
 
-    process_define(spec)
     return spec

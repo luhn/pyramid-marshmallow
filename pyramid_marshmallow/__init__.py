@@ -1,12 +1,11 @@
 from marshmallow import Schema, ValidationError
 from pyramid.viewderivers import VIEW
 
-from .utils import make_schema, define
+from .utils import make_schema
 
 
 __all__ = [
     'make_schema',
-    'define',
 ]
 
 
