@@ -160,6 +160,7 @@ def create_spec(title, version, introspector):
             docstring, op = split_docstring(view['callable'].__doc__)
             op.setdefault('responses', dict())
             op.setdefault('description', docstring)
+            op.setdefault('summary', path)
             op.setdefault('parameters', [])
             set_url_params(spec, op, view)
             if 'validate' in view and method != 'get':
