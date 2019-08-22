@@ -57,7 +57,7 @@ def make_path(introspector, introspectable):
         return None
 
 
-def add_definition(spec, schema):
+def _schema(schema):
     if isinstance(schema, dict):
         return make_schema(schema)
     else:
@@ -89,31 +89,28 @@ def split_docstring(docstring):
 
 
 def set_request_body(spec, op, view):
-    schema = add_definition(spec, view['validate'])
     op['requestBody'] = {
         'content': {
             'application/json': {
-                'schema': schema,
+                'schema': _schema(view['validate']),
             },
         },
     }
 
 
 def set_query_params(spec, op, view):
-    schema = add_definition(spec, view['validate'])
     op['parameters'].append({
         'in': 'query',
-        'schema': schema,
+        'schema': _schema(view['validate']),
     })
 
 
 def set_response_body(spec, op, view):
-    schema = add_definition(spec, view['marshal'])
     op['responses']['200'] = {
         'description': '',
         'content': {
             'application/json': {
-                'schema': schema,
+                'schema': _schema(view['marshal']),
             },
         },
     }
