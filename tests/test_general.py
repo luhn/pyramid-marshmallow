@@ -26,7 +26,7 @@ def test_process_schema_dict():
     assert schema.load({
         'title': 'Hunky Dory',
         'release_date': '1971-12-17',
-    }).data == {
+    }) == {
         'title': 'Hunky Dory',
         'release_date': Date(1971, 12, 17),
     }
@@ -38,10 +38,10 @@ def test_make_schema_dict():
         'release_date': fields.Date(),
     })
     assert issubclass(_Schema, Schema)
-    assert _Schema(strict=True).load({
+    assert _Schema().load({
         'title': 'Hunky Dory',
         'release_date': '1971-12-17',
-    }).data == {
+    }) == {
         'title': 'Hunky Dory',
         'release_date': Date(1971, 12, 17),
     }
@@ -53,10 +53,10 @@ def test_make_schema_kwargs():
         release_date=fields.Date(),
     )
     assert issubclass(_Schema, Schema)
-    assert _Schema(strict=True).load({
+    assert _Schema().load({
         'title': 'Hunky Dory',
         'release_date': '1971-12-17',
-    }).data == {
+    }) == {
         'title': 'Hunky Dory',
         'release_date': Date(1971, 12, 17),
     }

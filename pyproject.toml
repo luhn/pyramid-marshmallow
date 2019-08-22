@@ -13,8 +13,8 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.4"
-marshmallow = "^2.16"
+python = "^3.5"
+marshmallow = "^3.0"
 pyramid = "^1.7"
 
 # [apispec] extras

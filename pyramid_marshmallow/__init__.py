@@ -1,4 +1,4 @@
-from marshmallow import Schema
+from marshmallow import Schema, ValidationError as _ValidationError
 from pyramid.viewderivers import VIEW
 
 from .exceptions import SchemaError, ValidationError, MarshalError
@@ -48,10 +48,10 @@ def view_validator(view, info):
                 data[k] = v
         else:
             data = request.json_body
-        result = schema.load(data)
-        if result.errors:
-            raise ValidationError(result.errors)
-        request.data = result.data
+        try:
+            request.data = schema.load(data)
+        except _ValidationError as e:
+            raise ValidationError(e.normalized_messages())
         return view(context, request)
 
     return wrapped
@@ -67,10 +67,10 @@ def view_marshaller(view, info):
 
     def wrapped(context, request):
         output = view(context, request)
-        result = schema.dump(output)
-        if result.errors:
-            raise MarshalError(result.errors)
-        return result.data
+        try:
+            return schema.dump(output)
+        except _ValidationError as e:
+            raise MarshalError(e.normalized_messages())
 
     return wrapped
 
