@@ -14,7 +14,7 @@ parser.add_argument(
 )
 parser.add_argument(
     '--format',
-    help='The output, one of "json", "yaml", or "zip".',
+    help='The output, one of "json", "yaml", or "html".',
     default='json',
 )
 parser.add_argument(
@@ -37,10 +37,10 @@ def generate():
         output = json.dumps(spec.to_dict())
     elif args.format == 'yaml':
         output = spec.to_yaml()
+    elif args.format == 'html':
+        output = generate_html(spec)
     else:
-        output = generate_zip(spec)
-        if args.output == '-':
-            raise NotImplementedError('Cannot output zip file to stdout.')
+        raise ValueError('Format must be one of "json", "yaml", or "html".')
     if args.output == '-':
         print(output)
     else:
@@ -50,17 +50,44 @@ def generate():
             fh.write(output)
 
 
-def generate_zip(spec):
-    swaggerjson = json.dumps(spec.to_dict())
-    src = pkg_resources.resource_stream(
-        'pyramid_marshmallow', 'assets/swagger-ui.zip',
+def generate_html(spec):
+    data = json.dumps(spec.to_dict())
+    return HTML_TEMPLATE.format(
+        title=spec.title,
+        version=spec.version,
+        spec=data,
     )
-    with BytesIO() as fh:
-        shutil.copyfileobj(src, fh)
-        fh.seek(0)
-        with zipfile.ZipFile(fh, 'a') as zip:
-            zip.writestr('swagger.json', swaggerjson)
-        return fh.getvalue()
+
+
+HTML_TEMPLATE = """
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{title} {version}</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet">
+        <style>
+            body {{
+                margin: 0;
+                padding: 0;
+            }}
+        </style>
+    </head>
+    <body>
+        <div id="redoc"></div>
+        <script type="text/json" id="spec">{spec}</script>
+        <script src="https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js"></script>
+        <script>
+            window.addEventListener('load', function() {{
+                var el = document.getElementById('redoc');
+                var spec = JSON.parse(document.getElementById('spec').text);
+                Redoc.init(spec, {{}}, el);
+            }});
+        </script>
+    </body>
+</html>
+"""
 
 
 if __name__ == '__main__':

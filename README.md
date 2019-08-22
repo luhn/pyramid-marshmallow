@@ -129,9 +129,8 @@ This will output the spec to stdout as JSON.  You can set the `--output` flag
 to output the results to a file.
 
 You can set `--format yaml` to output the spec as YAML instead or
-`--format zip` to output a zip file containing the spec and
-[Swagger UI](https://swagger.io/tools/swagger-ui/), a web interface for viewing
-the spec.
+`--format html` to output the spec as an HTML file, powered by
+[ReDoc](https://github.com/Redocly/redoc).
 
 By default, your spec will be titled "Untitled" and versioned "0.1.0".  You can
 change this by setting `openapi.title` and `openapi.version` in your ini file.
