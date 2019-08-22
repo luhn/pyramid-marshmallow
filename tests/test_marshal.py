@@ -4,22 +4,12 @@ from types import SimpleNamespace
 from datetime import date as Date
 from marshmallow import Schema, fields
 
-from pyramid_marshmallow import view_marshaller, MarshalError
-
-
-class ErrorField(fields.Field):
-    """
-    A field to force a marshalling error.
-
-    """
-    def _serialize(self, value, attr, obj, **kwargs):
-        raise self.make_error("validator_failed")
+from pyramid_marshmallow import view_marshaller
 
 
 class AlbumSchema(Schema):
     title = fields.Str()
     release_date = fields.Date()
-    error = ErrorField()
 
 
 @pytest.fixture
@@ -42,20 +32,5 @@ def test_marshal(wrap_view):
     assert view('context', 'request') == {
         'title': 'Hunky Dory',
         'release_date': '1971-12-17',
-    }
-    unwrapped.assert_called_once_with('context', 'request')
-
-
-def test_marshal_error(wrap_view):
-    unwrapped = Mock(return_value={
-        'title': 'Hunky Dory',
-        'release_date': Date(1971, 12, 17),
-        'error': True,
-    })
-    view = wrap_view(unwrapped)
-    with pytest.raises(MarshalError) as exc:
-        view('context', 'request')
-    assert exc.value.errors == {
-        '_schema': ['Invalid value.'],
     }
     unwrapped.assert_called_once_with('context', 'request')

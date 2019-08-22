@@ -1,12 +1,12 @@
 import pytest
 from unittest.mock import Mock
 from types import SimpleNamespace
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, ValidationError
 from datetime import date as Date
 from pyramid.testing import DummyRequest
 from webob.multidict import MultiDict
 
-from pyramid_marshmallow import view_validator, ValidationError
+from pyramid_marshmallow import view_validator
 
 
 class AlbumSchema(Schema):
@@ -66,6 +66,12 @@ def test_validate_get(wrapped, view):
 
 
 def test_validate_error(wrapped, view):
+    """
+    Technically not necessary, since we just let marshmallow use its own error
+    handling.  However, our documentation makes claims on how this works, so we
+    test it.
+
+    """
     request = DummyRequest()
     request.method = 'POST'
     request.json_body = {
@@ -75,4 +81,8 @@ def test_validate_error(wrapped, view):
     context = object()
     with pytest.raises(ValidationError) as exc:
         wrapped(context, request)
-    assert exc.value.errors == {'release_date': ['Not a valid date.']}
+    assert exc.value.messages == {'release_date': ['Not a valid date.']}
+    assert(
+        exc.value.normalized_messages()
+        == {'release_date': ['Not a valid date.']}
+    )

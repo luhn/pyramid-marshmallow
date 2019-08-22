@@ -83,9 +83,10 @@ fields.
 
 ### Error handling
 
-If the validation fails, a `pyramid_marshmallow.ValidationError` is raised.
-The `errors` property of the exception contains a dictionary of error messages,
-just like the `Schema.load` method returns.
+pyramid-marshmallow passes through exceptions from marshmallow.  So errors
+during validation will raise a `marshmallow.exceptions.ValidationError`
+exception.
+([Documentation](https://marshmallow.readthedocs.io/en/stable/api_reference.html#marshmallow.exceptions.ValidationError))
 
 You may want to attach a view to this exception to expose the error messages to
 the user.
@@ -98,14 +99,9 @@ the user.
 def validation_error(context, request):
     request.response.status = 401  # HTTP Bad Request
     return {
-        'errors': context.errors,
+        'errors': context.normalized_messages(),
     }
 ```
-
-A failure during marshalling will result in a
-`pyramid_marshmallow.MarshalError` which behaves in the same manner.  It's
-usually less useful to attach a view to that exception, since marshalling
-errors are usually not encountered during standard operation.
 
 ## OpenAPI
 
