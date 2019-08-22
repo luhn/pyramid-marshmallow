@@ -3,6 +3,7 @@ from .utils import make_schema, pending_definitions
 
 try:
     from apispec import APISpec, utils
+    from apispec.ext.marshmallow import MarshmallowPlugin
     import yaml
 except ImportError:
     raise ImportError(
@@ -46,8 +47,6 @@ def add_definition(spec, schema):
     if isinstance(schema, dict):
         return make_schema(schema)
     else:
-        name = type(schema).__name__
-        spec.definition(name, schema=schema)
         return schema
 
 
@@ -56,8 +55,7 @@ def process_define(spec):
     Add pending schema.
 
     """
-    for schema in pending_definitions():
-        add_definition(spec, schema())
+    pass
 
 
 def split_docstring(docstring):
@@ -136,7 +134,7 @@ def set_tag(spec, op, view):
     if isinstance(tag, dict):
         # Cheating and using the private variable spec._tags
         if not any(x['name'] == tag['name'] for x in spec._tags):
-            spec.add_tag(tag)
+            spec.tag(tag)
         tag_name = tag['name']
     else:
         tag_name = tag
@@ -147,8 +145,8 @@ def create_spec(title, version, introspector):
     spec = APISpec(
         title=title,
         version=version,
-        openapi_version='3.0.1',
-        plugins=['apispec.ext.marshmallow'],
+        openapi_version='3.0.2',
+        plugins=[MarshmallowPlugin()],
     )
     for path, operations in list_paths(introspector):
         final_ops = dict()
@@ -171,7 +169,7 @@ def create_spec(title, version, introspector):
                     'description': '',
                 }
             final_ops[method] = op
-        spec.add_path(path, operations=final_ops)
+        spec.path(path, operations=final_ops)
 
     process_define(spec)
     return spec

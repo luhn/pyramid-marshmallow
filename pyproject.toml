@@ -18,8 +18,8 @@ marshmallow = "^3.0"
 pyramid = "^1.7"
 
 # [apispec] extras
-apispec = {version = "^0.37", optional = true}
-PyYAML = {version = "^3.10", optional = true}
+apispec = {version = "^2.0", optional = true}
+PyYAML = {version = ">=3.10", optional = true}
 
 [tool.poetry.dev-dependencies]
 "flake8" = "^3.5"
