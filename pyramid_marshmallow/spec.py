@@ -4,12 +4,26 @@ from .utils import make_schema
 try:
     from apispec import APISpec, utils
     from apispec.ext.marshmallow import MarshmallowPlugin
+    from apispec.ext.marshmallow.common import resolve_schema_cls
     import yaml
 except ImportError:
     raise ImportError(
         'You must have the `apispec` package installed to use this feature.  '
         'You can install it with `pip install pyramid_marshmallow[openapi].'
     )
+
+
+def schema_name_resolver(schema):
+    # TODO:  In apispec 3.0.0, this function will receive a schema instance.
+    # Should introspect instance to handle schema modifiers, maybe treating it
+    # as nonce schema.
+    schema_cls = resolve_schema_cls(schema)
+    name = schema_cls.__name__
+    if name == '_Schema':
+        return None
+    if name.endswith("Schema"):
+        return name[:-6] or name
+    return name
 
 
 def list_paths(introspector):
@@ -134,11 +148,14 @@ def set_tag(spec, op, view):
 
 
 def create_spec(title, version, introspector):
+    marshmallow_plugin = MarshmallowPlugin(
+        schema_name_resolver=schema_name_resolver,
+    )
     spec = APISpec(
         title=title,
         version=version,
         openapi_version='3.0.2',
-        plugins=[MarshmallowPlugin()],
+        plugins=[marshmallow_plugin],
     )
     for path, operations in list_paths(introspector):
         final_ops = dict()
