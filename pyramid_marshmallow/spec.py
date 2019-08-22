@@ -1,5 +1,5 @@
 from marshmallow import Schema
-from .utils import make_schema
+from .utils import make_schema, NonceSchema
 
 try:
     from apispec import APISpec, utils
@@ -19,7 +19,7 @@ def schema_name_resolver(schema):
     # as nonce schema.
     schema_cls = resolve_schema_cls(schema)
     name = schema_cls.__name__
-    if name == '_Schema':
+    if issubclass(schema_cls, NonceSchema):
         return None
     if name.endswith("Schema"):
         return name[:-6] or name
