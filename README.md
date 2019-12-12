@@ -5,6 +5,9 @@ marshal a JSON HTTP request or response using
 [Marshmallow](http://marshmallow.readthedocs.io/) schemas.  You can then
 leverage this to automatically generate an OpenAPI specification for your API.
 
+> **Version 0.5 required Marshmallow 3.x.  For Marshmallow 2.x, use version
+> 0.4.**
+
 ## Basic usage
 
 Install the project with `pip install pyramid-marshmallow`.
