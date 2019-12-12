@@ -84,13 +84,16 @@ def split_docstring(docstring):
             cut_from = index
             break
     else:
-        return (docstring or '').strip(), dict()
+        cut_from = len(split_lines)
 
-    docs = '\n'.join(split_lines[:cut_from]).strip()
+    summary = split_lines[0].strip() or None
+    docs = '\n'.join(split_lines[1:cut_from]).strip() or None
     yaml_string = '\n'.join(split_lines[cut_from:])
-    yaml_string = utils.dedent(yaml_string)
-    parsed = yaml.load(yaml_string)
-    return docs, parsed
+    if yaml_string:
+        parsed = yaml.load(yaml_string)
+    else:
+        parsed = dict()
+    return summary, docs, parsed
 
 
 def set_request_body(spec, op, view):
@@ -162,10 +165,12 @@ def create_spec(title, version, introspector):
     for path, operations in list_paths(introspector):
         final_ops = dict()
         for method, view in operations.items():
-            docstring, op = split_docstring(view['callable'].__doc__)
+            summary, descr, op = split_docstring(view['callable'].__doc__)
             op.setdefault('responses', dict())
-            op.setdefault('description', docstring)
-            op.setdefault('summary', path)
+            if summary:
+                op.setdefault('summary', summary)
+            if descr:
+                op.setdefault('description', descr)
             op.setdefault('parameters', [])
             set_url_params(spec, op, view)
             if 'validate' in view and method != 'get':
