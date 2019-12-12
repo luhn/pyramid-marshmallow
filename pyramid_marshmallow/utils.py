@@ -17,4 +17,7 @@ def make_schema(schema=None, **kwargs):
     """
     if schema is None:
         schema = kwargs
-    return type('_Schema', (NonceSchema,), schema.copy())
+    schema = schema.copy()
+    schema['__module__'] = NonceSchema.__module__
+    cls = type('_NonceSchema', (NonceSchema,), schema)
+    return cls
