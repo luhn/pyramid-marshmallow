@@ -4,7 +4,9 @@ from .utils import make_schema, NonceSchema
 try:
     from apispec import APISpec, utils
     from apispec.ext.marshmallow import MarshmallowPlugin
-    from apispec.ext.marshmallow.common import resolve_schema_cls
+    from apispec.ext.marshmallow.common import (
+        resolve_schema_cls, resolve_schema_instance,
+    )
     import yaml
 except ImportError:
     raise ImportError(
@@ -14,15 +16,19 @@ except ImportError:
 
 
 def schema_name_resolver(schema):
-    # TODO:  In apispec 3.0.0, this function will receive a schema instance.
-    # Should introspect instance to handle schema modifiers, maybe treating it
-    # as nonce schema.
-    schema_cls = resolve_schema_cls(schema)
-    name = schema_cls.__name__
-    if issubclass(schema_cls, NonceSchema):
-        return None
+    cls = resolve_schema_cls(schema)
+    instance = resolve_schema_instance(schema)
+    name = cls.__name__
+    if issubclass(cls, NonceSchema):
+        # Nonce schemas are defined inline
+        return False
+    if instance.only:
+        # If schema includes only select fields, treat it as nonce
+        return False
     if name.endswith("Schema"):
         return name[:-6] or name
+    if instance.partial:
+        name = 'Partial' + name
     return name
 
 
