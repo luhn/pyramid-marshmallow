@@ -7,6 +7,7 @@ from .utils import make_schema, NonceSchema
 __all__ = [
     'make_schema',
     'NonceSchema',
+    'ValidationError',
 ]
 
 

@@ -1,4 +1,3 @@
-from marshmallow import Schema
 from .utils import make_schema, NonceSchema
 
 try:

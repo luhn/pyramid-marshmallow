@@ -1,7 +1,3 @@
-from io import BytesIO
-import zipfile
-import shutil
-import pkg_resources
 import argparse
 import json
 from pyramid.paster import get_app
@@ -66,7 +62,8 @@ HTML_TEMPLATE = """
         <title>{title} {version}</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400\
+,700|Roboto:300,400,700" rel="stylesheet">
         <style>
             body {{
                 margin: 0;
@@ -77,7 +74,8 @@ HTML_TEMPLATE = """
     <body>
         <div id="redoc"></div>
         <script type="text/json" id="spec">{spec}</script>
-        <script src="https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.sta\
+ndalone.js"></script>
         <script>
             window.addEventListener('load', function() {{
                 var el = document.getElementById('redoc');
