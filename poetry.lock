@@ -3,8 +3,8 @@ category = "main"
 description = "A pluggable API specification generator. Currently supports the OpenAPI Specification (f.k.a. the Swagger specification)."
 name = "apispec"
 optional = true
-python-versions = "*"
-version = "2.0.2"
+python-versions = ">=3.5"
+version = "3.1.0"
 
 [[package]]
 category = "dev"
@@ -337,11 +337,11 @@ setuptools = "*"
 openapi = ["apispec", "PyYAML"]
 
 [metadata]
-content-hash = "f0b46af0b099b45e6cf4d37a193825557ce11f8205c33cd665b1a41562da16df"
+content-hash = "5a192880483c73d404d22d6a9c2f5c8c11ef7cf981c30f4bd18091fbdf92e218"
 python-versions = "^3.5"
 
 [metadata.hashes]
-apispec = ["11d1aaf620a80f67ded7688fcaf14fa4fd975d566876b5db69b067ffbfe4d1d9", "2f4734203e53f6ae6499d1f2168d19e62f04f071d6e4b86c6d6014ebf2ebdf6b"]
+apispec = ["cf8e1f3b56949710f8cf23797b7f40215e9dae8bac583789a3f2c13dc56349fa", "fe5cf5fc89b1c4a73acd5af3a10ede02b31ec116f215ed02271cb905d3172367"]
 atomicwrites = ["03472c30eb2c5d1ba9227e4c2ca66ab8287fbfbbda3888aa93dc2e28fc6811b4", "75a9445bac02d8d058d5e1fe689654ba5a6556a1dfd8ce6ec55a0ed79866cfa6"]
 attrs = ["08a96c641c3a74e44eb59afb61a24f2cb9f4d7188748e76ba4bb5edfa3cb7d1c", "f7b7ce16570fe9965acd6d30101a28f62fb4a7f9e926b3bbc9b61f8b04247e72"]
 beautifulsoup4 = ["5279c36b4b2ec2cb4298d723791467e3000e5384a43ea0cdf5d45207c7e97169", "6135db2ba678168c07950f9a16c4031822c6f4aec75a65e0a97bc5ca09789931", "dcdef580e18a76d54002088602eba453eec38ebbcafafeaabd8cab12b6155d57"]
