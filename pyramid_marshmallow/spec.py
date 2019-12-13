@@ -152,7 +152,7 @@ def set_tag(spec, op, view):
     op.setdefault('tags', []).append(tag_name)
 
 
-def create_spec(title, version, introspector):
+def create_spec(title, version, introspector, zone=None):
     marshmallow_plugin = MarshmallowPlugin(
         schema_name_resolver=schema_name_resolver,
     )
@@ -165,6 +165,8 @@ def create_spec(title, version, introspector):
     for path, operations in list_paths(introspector):
         final_ops = dict()
         for method, view in operations.items():
+            if zone is not None and zone != view.get('api_zone'):
+                continue
             summary, descr, user_op = split_docstring(view['callable'].__doc__)
             op = {
                 'responses': dict(),
@@ -184,8 +186,7 @@ def create_spec(title, version, introspector):
                 set_response_body(spec, op, view)
             set_tag(spec, op, view)
             final_op = utils.deepupdate(op, user_op)
-            if view.get('apispec'):
-                final_op = utils.deepupdate(final_op, view['apispec'])
+            final_op = utils.deepupdate(final_op, view.get('apispec', dict()))
 
             # We are required to have some response, so make one up.
             if not final_op['responses']:

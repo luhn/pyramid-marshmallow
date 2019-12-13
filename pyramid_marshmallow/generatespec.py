@@ -9,6 +9,14 @@ parser.add_argument(
     help='The .ini config file for the Pyramid project.',
 )
 parser.add_argument(
+    '--zone',
+    help=(
+        'The API zone to generate spec for.  See documentation for more '
+        'details.',
+    ),
+    default='json',
+)
+parser.add_argument(
     '--format',
     help='The output, one of "json", "yaml", or "html".',
     default='json',
@@ -28,7 +36,7 @@ def generate():
     title = settings.get('openapi.title', 'Untitled')
     version = settings.get('openapi.version', '0.0.0')
     introspector = app.registry.introspector
-    spec = create_spec(title, version, introspector)
+    spec = create_spec(title, version, introspector, zone=args.zone)
     if args.format == 'json':
         output = json.dumps(spec.to_dict())
     elif args.format == 'yaml':

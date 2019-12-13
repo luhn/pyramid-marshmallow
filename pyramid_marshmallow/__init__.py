@@ -74,4 +74,4 @@ def view_apispec(view, info):
     return view
 
 
-view_apispec.options = ('apispec',)
+view_apispec.options = ('apispec', 'api_zone')
