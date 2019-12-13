@@ -1,6 +1,11 @@
 import argparse
 import json
+import yaml
+from io import StringIO
 from pyramid.paster import get_app
+from apispec import utils, yaml_utils
+
+from .spec import create_spec
 
 
 parser = argparse.ArgumentParser()
@@ -14,7 +19,10 @@ parser.add_argument(
         'The API zone to generate spec for.  See documentation for more '
         'details.',
     ),
-    default='json',
+)
+parser.add_argument(
+    '--merge',
+    help='A YAML file to merge with the generated spec.',
 )
 parser.add_argument(
     '--format',
@@ -29,7 +37,6 @@ parser.add_argument(
 
 
 def generate():
-    from .spec import create_spec
     args = parser.parse_args()
     app = get_app(args.ini)
     settings = app.registry.settings
@@ -37,12 +44,15 @@ def generate():
     version = settings.get('openapi.version', '0.0.0')
     introspector = app.registry.introspector
     spec = create_spec(title, version, introspector, zone=args.zone)
+    spec_json = spec.to_dict()
+    if args.merge:
+        spec_json = merge(spec_json, args.merge)
     if args.format == 'json':
-        output = json.dumps(spec.to_dict())
+        output = json.dumps(spec_json)
     elif args.format == 'yaml':
-        output = spec.to_yaml()
+        output = yaml_utils.dict_to_yaml(spec_json)
     elif args.format == 'html':
-        output = generate_html(spec)
+        output = generate_html(spec_json)
     else:
         raise ValueError('Format must be one of "json", "yaml", or "html".')
     if args.output == '-':
@@ -54,8 +64,14 @@ def generate():
             fh.write(output)
 
 
+def merge(spec, mergefile):
+    with open(mergefile) as fh:
+        to_merge = yaml.safe_load(fh)
+    return utils.deepupdate(spec, to_merge)
+
+
 def generate_html(spec):
-    data = json.dumps(spec.to_dict())
+    data = json.dumps(spec)
     return HTML_TEMPLATE.format(
         title=spec.title,
         version=spec.version,
