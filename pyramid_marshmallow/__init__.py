@@ -14,6 +14,7 @@ __all__ = [
 def includeme(config):
     config.add_view_deriver(view_validator)
     config.add_view_deriver(view_marshaller, under='rendered_view', over=VIEW)
+    config.add_view_deriver(view_apispec)
 
 
 def process_schema(schema):
@@ -67,3 +68,10 @@ def view_marshaller(view, info):
 
 
 view_marshaller.options = ('marshal',)
+
+
+def view_apispec(view, info):
+    return view
+
+
+view_apispec.options = ('apispec',)

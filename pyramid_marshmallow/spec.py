@@ -165,27 +165,34 @@ def create_spec(title, version, introspector):
     for path, operations in list_paths(introspector):
         final_ops = dict()
         for method, view in operations.items():
-            summary, descr, op = split_docstring(view['callable'].__doc__)
-            op.setdefault('responses', dict())
+            summary, descr, user_op = split_docstring(view['callable'].__doc__)
+            op = {
+                'responses': dict(),
+                'parameters': [],
+            }
             if summary:
-                op.setdefault('summary', summary)
+                op['summary'] = summary
             if descr:
-                op.setdefault('description', descr)
-            op.setdefault('parameters', [])
+                op['description'] = descr
             set_url_params(spec, op, view)
-            if 'validate' in view and method != 'get':
-                set_request_body(spec, op, view)
-            elif 'validate' in view:
-                set_query_params(spec, op, view)
+            if 'validate' in view:
+                if method == 'get':
+                    set_query_params(spec, op, view)
+                else:
+                    set_request_body(spec, op, view)
             if 'marshal' in view:
                 set_response_body(spec, op, view)
             set_tag(spec, op, view)
+            final_op = utils.deepupdate(op, user_op)
+            if view.get('apispec'):
+                final_op = utils.deepupdate(final_op, view['apispec'])
+
             # We are required to have some response, so make one up.
-            if not op['responses']:
-                op['responses']['200'] = {
+            if not final_op['responses']:
+                final_op['responses']['200'] = {
                     'description': '',
                 }
-            final_ops[method] = op
+            final_ops[method] = final_op
         spec.path(path, operations=final_ops)
 
     return spec
