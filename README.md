@@ -183,7 +183,7 @@ def create_widget(context, request):
     return HTTPCreated()
 ```
 
-You can also pass a dictionary as the `apispec` property to
+You can also pass a dictionary as the `api_spec` property to
 `Configurator.add_view` or `@view_config`, which will be merged with the spec
 in the same way.  This can be advantageous if a single function services
 multiple views.
@@ -193,7 +193,7 @@ multiple views.
     context=WidgetResource,
     method='post',
     validate=WidgetSchema(),
-    apispec={
+    api_spec={
         'summary': 'Create widget',
     },
 )
@@ -201,7 +201,7 @@ multiple views.
     context=WidgetResource,
     method='put',
     validate=WidgetSchema(),
-    apispec={
+    api_spec={
         'summary': 'Update widget',
     },
 )
