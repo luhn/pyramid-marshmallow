@@ -1,7 +1,6 @@
 import argparse
 import json
 import yaml
-from io import StringIO
 from pyramid.paster import get_app
 from apispec import utils, yaml_utils
 
