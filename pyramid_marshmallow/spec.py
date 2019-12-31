@@ -186,7 +186,7 @@ def create_spec(title, version, introspector, zone=None):
                 set_response_body(spec, op, view)
             set_tag(spec, op, view)
             final_op = utils.deepupdate(op, user_op)
-            final_op = utils.deepupdate(final_op, view.get('apispec', dict()))
+            final_op = utils.deepupdate(final_op, view.get('api_spec', dict()))
 
             # We are required to have some response, so make one up.
             if not final_op['responses']:
