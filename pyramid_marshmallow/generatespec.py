@@ -72,8 +72,8 @@ def merge(spec, mergefile):
 def generate_html(spec):
     data = json.dumps(spec)
     return HTML_TEMPLATE.format(
-        title=spec.title,
-        version=spec.version,
+        title=spec['info']['title'],
+        version=spec['info']['version'],
         spec=data,
     )
 
