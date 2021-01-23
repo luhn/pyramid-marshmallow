@@ -1,8 +1,10 @@
 
 lint:
-	poetry run flake8 pyramid_apispec tests
+	isort pyramid_marshmallow tests
+	black pyramid_marshmallow tests
+	flake8 pyramid_marshmallow tests
 
 test: lint
-	poetry run pytest tests/
+	pytest tests
 
 .PHONY: lint test
