@@ -15,22 +15,26 @@ class AlbumSchema(Schema):
 @pytest.fixture
 def wrap_view():
     def wrap(view):
-        info = SimpleNamespace(options={
-            'marshal': AlbumSchema(),
-        })
+        info = SimpleNamespace(
+            options={
+                "marshal": AlbumSchema(),
+            }
+        )
         return view_marshaller(view, info)
 
     return wrap
 
 
 def test_marshal(wrap_view):
-    unwrapped = Mock(return_value={
-        'title': 'Hunky Dory',
-        'release_date': Date(1971, 12, 17),
-    })
+    unwrapped = Mock(
+        return_value={
+            "title": "Hunky Dory",
+            "release_date": Date(1971, 12, 17),
+        }
+    )
     view = wrap_view(unwrapped)
-    assert view('context', 'request') == {
-        'title': 'Hunky Dory',
-        'release_date': '1971-12-17',
+    assert view("context", "request") == {
+        "title": "Hunky Dory",
+        "release_date": "1971-12-17",
     }
-    unwrapped.assert_called_once_with('context', 'request')
+    unwrapped.assert_called_once_with("context", "request")

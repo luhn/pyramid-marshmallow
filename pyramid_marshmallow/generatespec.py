@@ -9,29 +9,29 @@ from .spec import create_spec
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    'ini',
-    help='The .ini config file for the Pyramid project.',
+    "ini",
+    help="The .ini config file for the Pyramid project.",
 )
 parser.add_argument(
-    '--zone',
+    "--zone",
     help=(
-        'The API zone to generate spec for.  See documentation for more '
-        'details.',
+        "The API zone to generate spec for.  See documentation for more "
+        "details.",
     ),
 )
 parser.add_argument(
-    '--merge',
-    help='A YAML file to merge with the generated spec.',
+    "--merge",
+    help="A YAML file to merge with the generated spec.",
 )
 parser.add_argument(
-    '--format',
+    "--format",
     help='The output, one of "json", "yaml", or "html".',
-    default='json',
+    default="json",
 )
 parser.add_argument(
-    '--output',
-    help='The file to output to.',
-    default='-',
+    "--output",
+    help="The file to output to.",
+    default="-",
 )
 
 
@@ -39,27 +39,27 @@ def generate():
     args = parser.parse_args()
     app = get_app(args.ini)
     settings = app.registry.settings
-    title = settings.get('openapi.title', 'Untitled')
-    version = settings.get('openapi.version', '0.0.0')
+    title = settings.get("openapi.title", "Untitled")
+    version = settings.get("openapi.version", "0.0.0")
     introspector = app.registry.introspector
     spec = create_spec(title, version, introspector, zone=args.zone)
     spec_json = spec.to_dict()
     if args.merge:
         spec_json = merge(spec_json, args.merge)
-    if args.format == 'json':
+    if args.format == "json":
         output = json.dumps(spec_json)
-    elif args.format == 'yaml':
+    elif args.format == "yaml":
         output = yaml_utils.dict_to_yaml(spec_json)
-    elif args.format == 'html':
+    elif args.format == "html":
         output = generate_html(spec_json)
     else:
         raise ValueError('Format must be one of "json", "yaml", or "html".')
-    if args.output == '-':
+    if args.output == "-":
         print(output)
     else:
-        with open(args.output, 'wb') as fh:
+        with open(args.output, "wb") as fh:
             if isinstance(output, str):
-                output = output.encode('utf8')
+                output = output.encode("utf8")
             fh.write(output)
 
 
@@ -72,8 +72,8 @@ def merge(spec, mergefile):
 def generate_html(spec):
     data = json.dumps(spec)
     return HTML_TEMPLATE.format(
-        title=spec['info']['title'],
-        version=spec['info']['version'],
+        title=spec["info"]["title"],
+        version=spec["info"]["version"],
         spec=data,
     )
 
@@ -111,5 +111,5 @@ ndalone.js"></script>
 """
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     generate()

@@ -7,6 +7,7 @@ class NonceSchema(Schema):
     dictionaries).
 
     """
+
     pass
 
 
@@ -18,6 +19,6 @@ def make_schema(schema=None, **kwargs):
     if schema is None:
         schema = kwargs
     schema = schema.copy()
-    schema['__module__'] = NonceSchema.__module__
-    cls = type('_NonceSchema', (NonceSchema,), schema)
+    schema["__module__"] = NonceSchema.__module__
+    cls = type("_NonceSchema", (NonceSchema,), schema)
     return cls
