@@ -1,13 +1,13 @@
-from .utils import make_schema, NonceSchema
+from .utils import NonceSchema, make_schema
 
 try:
+    import yaml
     from apispec import APISpec, utils
     from apispec.ext.marshmallow import MarshmallowPlugin
     from apispec.ext.marshmallow.common import (
         resolve_schema_cls,
         resolve_schema_instance,
     )
-    import yaml
 except ImportError:
     raise ImportError(
         "You must have the `apispec` package installed to use this feature.  "

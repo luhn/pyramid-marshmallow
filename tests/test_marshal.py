@@ -1,7 +1,8 @@
-import pytest
-from unittest.mock import Mock
-from types import SimpleNamespace
 from datetime import date as Date
+from types import SimpleNamespace
+from unittest.mock import Mock
+
+import pytest
 from marshmallow import Schema, fields
 
 from pyramid_marshmallow import view_marshaller

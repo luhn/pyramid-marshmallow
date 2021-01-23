@@ -1,11 +1,11 @@
-import pytest
-from webtest import TestApp
 from datetime import date as Date
-from marshmallow import Schema, fields
 
+import pytest
+from marshmallow import Schema, fields
 from pyramid.config import Configurator
-from pyramid.response import Response
 from pyramid.httpexceptions import HTTPNoContent
+from pyramid.response import Response
+from webtest import TestApp
 
 
 class AlbumSchema(Schema):

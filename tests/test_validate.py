@@ -1,8 +1,9 @@
-import pytest
-from unittest.mock import Mock
-from types import SimpleNamespace
-from marshmallow import Schema, fields, ValidationError
 from datetime import date as Date
+from types import SimpleNamespace
+from unittest.mock import Mock
+
+import pytest
+from marshmallow import Schema, ValidationError, fields
 from pyramid.testing import DummyRequest
 from webob.multidict import MultiDict
 

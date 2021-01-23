@@ -1,8 +1,7 @@
 from marshmallow import Schema, ValidationError
 from pyramid.viewderivers import VIEW
 
-from .utils import make_schema, NonceSchema
-
+from .utils import NonceSchema, make_schema
 
 __all__ = [
     "make_schema",

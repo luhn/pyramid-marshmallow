@@ -30,6 +30,7 @@ EXTRAS_REQUIRE = {
     "linting": [
         "black==20.8b1",
         "flake8~=3.8",
+        "isort~=5.7",
     ],
 }
 

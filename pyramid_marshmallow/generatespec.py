@@ -1,11 +1,11 @@
 import argparse
 import json
+
 import yaml
-from pyramid.paster import get_app
 from apispec import utils, yaml_utils
+from pyramid.paster import get_app
 
 from .spec import create_spec
-
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
