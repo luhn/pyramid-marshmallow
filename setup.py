@@ -24,11 +24,11 @@ REQUIRES = [
 
 EXTRAS_REQUIRE = {
     "testing": [
-        "pytest~=3.6",
+        "pytest~=6.2",
         "webtest~=2.0",
     ],
     "linting": [
-        "flake8~=3.5",
+        "flake8~=3.8",
     ],
 }
 
