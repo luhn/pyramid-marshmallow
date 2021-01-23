@@ -19,10 +19,15 @@ CLASSIFIERS = [
 ]
 
 REQUIRES = [
-    "pyramid>=1.7,<2.0",
+    "pyramid~=1.7",
+    "marshmallow~=3.0"
 ]
 
 EXTRAS_REQUIRE = {
+    "apispec": [
+        "apispec~=3.0",
+        "PyYAML~=5.4",
+    ],
     "testing": [
         "pytest~=6.2",
         "webtest~=2.0",
