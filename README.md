@@ -237,8 +237,9 @@ class Widget(Resource):
 You likely will wish to augment your API spec with a description, additional components, and more.
 This can be achieved with a mergefile.
 Write a YAML file with the parts of the spec you wish to augment and pass the filename as the `--merge` flag with `generate-spec`.
-You can also pass a resource specifier in the format `[module]:[path]`.
+You can also reference a package resource in the format `[package]:[path]`.
 The file will be loaded and merged into the generated spec.
+You can use the `--merge` flag multiple times to merge in multiple files.
 
 ## Zones
 

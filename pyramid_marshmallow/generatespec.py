@@ -27,6 +27,7 @@ parser.add_argument(
 parser.add_argument(
     "--merge",
     help="A YAML file to merge with the generated spec.",
+    nargs="*",
 )
 parser.add_argument(
     "--format",
@@ -52,8 +53,8 @@ def generate():
         raise ValueError("Must specify one of [app] or --ini.")
     spec = create_spec(app.registry, zone=args.zone)
     spec_json = spec.to_dict()
-    if args.merge:
-        spec_json = merge(spec_json, args.merge)
+    for mergefile in args.merge:
+        spec_json = merge(spec_json, mergefile)
     if args.format == "json":
         output = json.dumps(spec_json)
     elif args.format == "yaml":
