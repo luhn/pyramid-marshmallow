@@ -95,7 +95,7 @@ def split_docstring(docstring):
     docs = "\n".join(split_lines[1:cut_from]).strip() or None
     yaml_string = "\n".join(split_lines[cut_from:])
     if yaml_string:
-        parsed = yaml.load(yaml_string)
+        parsed = yaml.safe_load(yaml_string)
     else:
         parsed = dict()
     return summary, docs, parsed
