@@ -155,7 +155,9 @@ def set_tag(spec, op, view):
     op.setdefault("tags", []).append(tag_name)
 
 
-def create_spec(title, version, introspector, zone=None):
+def create_spec(registry, zone=None):
+    title = registry.settings.get("openapi.title", "Untitled")
+    version = registry.settings.get("openapi.version", "0.0.0")
     marshmallow_plugin = MarshmallowPlugin(
         schema_name_resolver=schema_name_resolver,
     )
@@ -165,7 +167,7 @@ def create_spec(title, version, introspector, zone=None):
         openapi_version="3.0.2",
         plugins=[marshmallow_plugin],
     )
-    for path, operations in list_paths(introspector):
+    for path, operations in list_paths(registry.introspector):
         final_ops = dict()
         for method, view in operations.items():
             if zone is not None and zone != view.get("api_zone"):

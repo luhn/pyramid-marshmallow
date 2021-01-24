@@ -38,11 +38,7 @@ parser.add_argument(
 def generate():
     args = parser.parse_args()
     app = get_app(args.ini)
-    settings = app.registry.settings
-    title = settings.get("openapi.title", "Untitled")
-    version = settings.get("openapi.version", "0.0.0")
-    introspector = app.registry.introspector
-    spec = create_spec(title, version, introspector, zone=args.zone)
+    spec = create_spec(app.registry, zone=args.zone)
     spec_json = spec.to_dict()
     if args.merge:
         spec_json = merge(spec_json, args.merge)
