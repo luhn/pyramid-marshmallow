@@ -1,5 +1,7 @@
 import json
 
+import pkg_resources
+
 from .utils import NonceSchema, make_schema
 
 try:
@@ -207,7 +209,12 @@ def create_spec(registry, zone=None):
 
 
 def merge(spec, mergefile):
-    with open(mergefile) as fh:
+    if ":" in mergefile:
+        module, _, path = mergefile.partition(":")
+        fh = pkg_resources.resource_stream(module, path)
+    else:
+        fh = open(mergefile)
+    with fh:
         to_merge = yaml.safe_load(fh)
     return utils.deepupdate(spec, to_merge)
 
