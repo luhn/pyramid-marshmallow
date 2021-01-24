@@ -120,12 +120,16 @@ First, you'll need to install some extra dependencies.
 pip install pyramid-marshmallow[openapi]
 ```
 
-Now you can generate your spec by simply passing in an ini file.
-pyramid-marshmallow needs to run your application in order to inspect it, so
-the ini file should contain all the necessary configuration to do so.
+You can generate your spec by calling the `generate-spec` command with your application as the first argument, formatted as `[module]:[name]`.
 
 ```bash
-generate-spec development.ini
+generate-spec myproject:app
+```
+
+If you configure your application via an ini file (Paste), you can also use that.
+
+```bash
+generate-spec --ini development.ini
 ```
 
 This will output the spec to stdout as JSON.  You can set the `--output` flag
