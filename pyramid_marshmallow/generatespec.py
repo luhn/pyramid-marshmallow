@@ -1,11 +1,10 @@
 import argparse
 import json
 
-import yaml
-from apispec import utils, yaml_utils
+from apispec import yaml_utils
 from pyramid.paster import get_app
 
-from .spec import create_spec
+from .spec import create_spec, generate_html, merge
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -57,54 +56,6 @@ def generate():
             if isinstance(output, str):
                 output = output.encode("utf8")
             fh.write(output)
-
-
-def merge(spec, mergefile):
-    with open(mergefile) as fh:
-        to_merge = yaml.safe_load(fh)
-    return utils.deepupdate(spec, to_merge)
-
-
-def generate_html(spec):
-    data = json.dumps(spec)
-    return HTML_TEMPLATE.format(
-        title=spec["info"]["title"],
-        version=spec["info"]["version"],
-        spec=data,
-    )
-
-
-HTML_TEMPLATE = """
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>{title} {version}</title>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400\
-,700|Roboto:300,400,700" rel="stylesheet">
-        <style>
-            body {{
-                margin: 0;
-                padding: 0;
-            }}
-        </style>
-    </head>
-    <body>
-        <div id="redoc"></div>
-        <script type="text/json" id="spec">{spec}</script>
-        <script src="https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.sta\
-ndalone.js"></script>
-        <script>
-            window.addEventListener('load', function() {{
-                var el = document.getElementById('redoc');
-                var spec = JSON.parse(document.getElementById('spec').text);
-                Redoc.init(spec, {{}}, el);
-            }});
-        </script>
-    </body>
-</html>
-"""
 
 
 if __name__ == "__main__":
