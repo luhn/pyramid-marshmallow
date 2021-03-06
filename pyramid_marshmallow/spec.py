@@ -1,8 +1,7 @@
 import json
 
 import pkg_resources
-
-from .utils import NonceSchema, make_schema
+from marshmallow import Schema
 
 try:
     import yaml
@@ -23,8 +22,8 @@ def schema_name_resolver(schema):
     cls = resolve_schema_cls(schema)
     instance = resolve_schema_instance(schema)
     name = cls.__name__
-    if issubclass(cls, NonceSchema):
-        # Nonce schemas are defined inline
+    if not cls.opts.register:
+        # Unregistered schemas are put inline.
         return False
     if instance.only:
         # If schema includes only select fields, treat it as nonce
@@ -69,7 +68,7 @@ def make_path(introspector, introspectable):
 
 def _schema(schema):
     if isinstance(schema, dict):
-        return make_schema(schema)
+        return Schema.from_dict(schema)
     else:
         return schema
 

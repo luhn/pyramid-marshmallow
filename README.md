@@ -71,7 +71,7 @@ As a convenience, you can pass in a dictionary to `validate` or `marshal` and py
 )
 ```
 
-You can also get a schema made from a dictionary by using the `pyramid_marshmallow.make_schema` function.
+You can also get a schema made from a dictionary by using Marshmallow's `Schema.from_dict` classmethod.
 This can be useful for `Nested` fields.
 
 
