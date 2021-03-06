@@ -53,7 +53,7 @@ def generate():
         raise ValueError("Must specify one of [app] or --ini.")
     spec = create_spec(app.registry, zone=args.zone)
     spec_json = spec.to_dict()
-    for mergefile in args.merge:
+    for mergefile in (args.merge or []) + _merges_from_settings(app.registry):
         spec_json = merge(spec_json, mergefile)
     if args.format == "json":
         output = json.dumps(spec_json)
@@ -76,6 +76,17 @@ def import_app(name):
     module_name, _, var_name = name.partition(":")
     module = import_module(module_name)
     return getattr(module, var_name)
+
+
+def _merges_from_settings(registry):
+    "Parse Pyramid settings to find merge files."
+    setting = registry.settings.get("pyramid_marshmallow.merge")
+    if not setting:
+        return []
+    elif isinstance(setting, str):
+        return [x.strip() for x in setting.split(",")]
+    else:
+        return setting
 
 
 if __name__ == "__main__":
