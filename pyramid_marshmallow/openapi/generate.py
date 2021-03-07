@@ -5,7 +5,7 @@ from importlib import import_module
 from apispec import yaml_utils
 from pyramid.paster import get_app
 
-from .spec import create_spec, generate_html, merge
+from . import create_spec, generate_html, merge
 
 parser = argparse.ArgumentParser()
 parser.add_argument(

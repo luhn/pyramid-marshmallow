@@ -62,7 +62,7 @@ setup(
     python_requires=">=3.6",
     entry_points={
         "console_scripts": [
-            "generate-spec=pyramid_marshmallow.generatespec:generate",
+            "generate-spec=pyramid_marshmallow.openapi.generate:generate",
         ],
     },
 )
