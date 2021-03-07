@@ -5,7 +5,7 @@ from importlib import import_module
 from apispec import yaml_utils
 from pyramid.paster import get_app
 
-from . import create_spec, generate_html, merge
+from . import create_spec, generate_html
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -51,10 +51,7 @@ def generate():
         app = get_app(args.ini)
     else:
         raise ValueError("Must specify one of [app] or --ini.")
-    spec = create_spec(app.registry, zone=args.zone)
-    spec_json = spec.to_dict()
-    for mergefile in (args.merge or []) + _merges_from_settings(app.registry):
-        spec_json = merge(spec_json, mergefile)
+    spec_json = create_spec(app.registry, zone=args.zone, merge=args.merge)
     if args.format == "json":
         output = json.dumps(spec_json)
     elif args.format == "yaml":

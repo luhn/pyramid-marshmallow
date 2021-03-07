@@ -240,7 +240,7 @@ Write a YAML file with the parts of the spec you wish to augment and pass the fi
 You can also reference a package resource in the format `[package]:[path]`.
 The file will be loaded and merged into the generated spec.
 You can use the `--merge` flag multiple times to merge in multiple files.
-You can also add a merge file by adding the path to the `pyramid_marshmallow.merge` setting in your Pyramid application.
+You can also add a merge file by adding the path to the `openapi.merge` setting in your Pyramid application.
 Multiple mergefiles can be separated with a comma.
 
 ## Zones

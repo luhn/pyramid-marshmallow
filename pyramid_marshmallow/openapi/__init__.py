@@ -158,7 +158,7 @@ def set_tag(spec, op, view):
     op.setdefault("tags", []).append(tag_name)
 
 
-def create_spec(registry, zone=None):
+def create_spec(registry, zone=None, merge=None):
     title = registry.settings.get("openapi.title", "Untitled")
     version = registry.settings.get("openapi.version", "0.0.0")
     marshmallow_plugin = MarshmallowPlugin(
@@ -204,7 +204,27 @@ def create_spec(registry, zone=None):
             final_ops[method] = final_op
         spec.path(path, operations=final_ops)
 
-    return spec
+    json = spec.to_dict()
+    return _perform_merges(json, merge, registry.settings.get("openapi.merge"))
+
+
+def _perform_merges(json, mergefile, merge_setting):
+    # Perform merges
+    if mergefile is None:
+        merges = []
+    elif isinstance(mergefile, str):
+        merges = [merge]
+    else:
+        merges = merge
+    if not merge_setting:
+        pass
+    elif isinstance(merge_setting, str):
+        merges.extend(x.strip() for x in merge_setting.split(","))
+    else:
+        merges.extend(merge_setting)
+    for mergefile in merges:
+        json = merge(json, mergefile)
+    return json
 
 
 def merge(spec, mergefile):
