@@ -33,7 +33,7 @@ def process_schema(schema):
     elif isinstance(schema, Schema):
         return schema
     elif isinstance(schema, dict):
-        return Schema.from_dict(schema)
+        return Schema.from_dict(schema)()
     else:
         raise TypeError("Schema is of invalid type.")
 
