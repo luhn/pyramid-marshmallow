@@ -20,7 +20,8 @@ CLASSIFIERS = [
 
 REQUIRES = [
     "pyramid>=1.7",
-    "marshmallow~=3.0"
+    "marshmallow~=3.0",
+    "zope.interface>=3.8.0",
 ]
 
 EXTRAS_REQUIRE = {
@@ -63,6 +64,7 @@ setup(
     entry_points={
         "console_scripts": [
             "generate-spec=pyramid_marshmallow.openapi.generate:generate",
+            "serve-spec=pyramid_marshmallow.openapi.serve:serve",
         ],
     },
 )

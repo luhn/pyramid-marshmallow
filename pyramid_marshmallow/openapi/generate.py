@@ -2,10 +2,9 @@ import argparse
 import json
 from importlib import import_module
 
-from apispec import yaml_utils
 from pyramid.paster import get_app
 
-from . import create_spec, generate_html
+from .spec import create_spec, generate_html, generate_yaml
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -55,7 +54,7 @@ def generate():
     if args.format == "json":
         output = json.dumps(spec_json)
     elif args.format == "yaml":
-        output = yaml_utils.dict_to_yaml(spec_json)
+        output = generate_yaml(spec_json)
     elif args.format == "html":
         output = generate_html(spec_json)
     else:
@@ -73,17 +72,6 @@ def import_app(name):
     module_name, _, var_name = name.partition(":")
     module = import_module(module_name)
     return getattr(module, var_name)
-
-
-def _merges_from_settings(registry):
-    "Parse Pyramid settings to find merge files."
-    setting = registry.settings.get("pyramid_marshmallow.merge")
-    if not setting:
-        return []
-    elif isinstance(setting, str):
-        return [x.strip() for x in setting.split(",")]
-    else:
-        return setting
 
 
 if __name__ == "__main__":

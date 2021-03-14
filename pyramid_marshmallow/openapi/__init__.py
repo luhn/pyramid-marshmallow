@@ -1,280 +1,123 @@
+import functools
 import json
 
-import pkg_resources
-from marshmallow import Schema
+from pyramid.response import Response
+from zope.interface import Interface, implementer
 
-try:
-    import yaml
-    from apispec import APISpec, utils
-    from apispec.ext.marshmallow import MarshmallowPlugin
-    from apispec.ext.marshmallow.common import (
-        resolve_schema_cls,
-        resolve_schema_instance,
+from .spec import create_spec, generate_html, generate_yaml
+
+
+def includeme(config):
+    config.registry.registerUtility(
+        SpecGenerator(config.registry),
+        ISpecGenerator,
     )
-except ImportError:
-    raise ImportError(
-        "You must have the `apispec` package installed to use this feature.  "
-        "You can install it with `pip install pyramid_marshmallow[openapi]."
-    )
+    config.add_directive("add_openapi_json_view", add_openapi_json_view)
+    config.add_directive("add_openapi_html_view", add_openapi_html_view)
+    config.add_directive("add_openapi_yaml_view", add_openapi_yaml_view)
 
 
-def schema_name_resolver(schema):
-    cls = resolve_schema_cls(schema)
-    instance = resolve_schema_instance(schema)
-    name = cls.__name__
-    if not cls.opts.register:
-        # Unregistered schemas are put inline.
-        return False
-    if instance.only:
-        # If schema includes only select fields, treat it as nonce
-        return False
-    if name.endswith("Schema"):
-        return name[:-6] or name
-    if instance.partial:
-        name = "Partial" + name
-    return name
-
-
-def list_paths(introspector):
-    for item in introspector.get_category("views"):
-        spect = item["introspectable"]
-        path = make_path(introspector, spect)
-        if path is None:
-            continue
-        operations = dict()
-        methods = spect["request_methods"] or ["GET"]
-        if isinstance(methods, str):
-            methods = [methods]
-        for method in methods:
-            method = method.lower()
-            operations[method] = spect
-        yield path, operations
-
-
-def make_path(introspector, introspectable):
-    if introspectable["route_name"]:
-        route = introspector.get("routes", introspectable["route_name"])
-        return route["pattern"]
-    elif introspectable["context"]:
-        context = introspectable["context"]
-        base = getattr(context, "__path__", None)
-        if base is None:
-            return None
-        else:
-            return base + "/" + (introspectable["name"] or "")
-    else:
-        return None
-
-
-def _schema(schema):
-    if isinstance(schema, dict):
-        return Schema.from_dict(schema)
-    else:
-        return schema
-
-
-def split_docstring(docstring):
+class ISpecGenerator(Interface):
     """
-    Split a docstring in half, delineated with a "---".  The first half is
-    returned verbatim, the second half is parsed as YAML.
+    Interface for a simple callable that returns the spec.
 
     """
-    split_lines = utils.trim_docstring(docstring).split("\n")
 
-    # Cut YAML from rest of docstring
-    for index, line in enumerate(split_lines):
-        line = line.strip()
-        if line.startswith("---"):
-            cut_from = index
-            break
-    else:
-        cut_from = len(split_lines)
-
-    summary = split_lines[0].strip() or None
-    docs = "\n".join(split_lines[1:cut_from]).strip() or None
-    yaml_string = "\n".join(split_lines[cut_from:])
-    if yaml_string:
-        parsed = yaml.safe_load(yaml_string)
-    else:
-        parsed = dict()
-    return summary, docs, parsed
+    def __call__(zone, merge):
+        ...
 
 
-def set_request_body(spec, op, view):
-    op["requestBody"] = {
-        "content": {
-            "application/json": {
-                "schema": _schema(view["validate"]),
-            },
-        },
-    }
+@implementer(ISpecGenerator)
+class SpecGenerator:
+    """
+    Generate and cache specs for the given registry.
+
+    """
+
+    def __init__(self, registry):
+        self.registry = registry
+
+    @functools.lru_cache
+    def __call__(self, zone, merge):
+        return create_spec(self.registry, zone=zone, merge=merge)
 
 
-def set_query_params(spec, op, view):
-    op["parameters"].append(
-        {
-            "in": "query",
-            "schema": _schema(view["validate"]),
-        }
+def _inject_params(view, zone=None, merge=None):
+    """
+    Add `zone` and `merge` arguments to given view callable.
+
+    Originally I was using `functools.partial` directly, but Pyramid would
+    complain unless I added `functools.update_wrapper`.
+
+    """
+    wrapper = functools.partial(view, zone=zone, merge=merge)
+    functools.update_wrapper(wrapper, view)
+    return wrapper
+
+
+def add_openapi_json_view(config, zone=None, merge=None, *args, **kwargs):
+    """
+    Add a view that returns the JSON spec with the given zone and mergefiles.
+    Additional args are passed to `Configuration.add_view`.
+
+    """
+    config.add_view(
+        _inject_params(json_view, zone=zone, merge=merge),
+        *args,
+        **kwargs,
     )
 
 
-def set_response_body(spec, op, view):
-    op["responses"]["200"] = {
-        "description": "",
-        "content": {
-            "application/json": {
-                "schema": _schema(view["marshal"]),
-            },
-        },
-    }
-
-
-def set_url_params(spec, op, view):
-    context = view["context"]
-    if not context:
-        return
-    params = getattr(context, "__params__", [])
-    for param in params:
-        param["in"] = "path"
-        param["required"] = True
-    op["parameters"].extend(params)
-
-
-def set_tag(spec, op, view):
-    context = view["context"]
-    if not context:
-        return
-    tag = getattr(context, "__tag__", None)
-    if not tag:
-        return
-    if isinstance(tag, dict):
-        # Cheating and using the private variable spec._tags
-        if not any(x["name"] == tag["name"] for x in spec._tags):
-            spec.tag(tag)
-        tag_name = tag["name"]
-    else:
-        tag_name = tag
-    op.setdefault("tags", []).append(tag_name)
-
-
-def create_spec(registry, zone=None, merge=None):
-    title = registry.settings.get("openapi.title", "Untitled")
-    version = registry.settings.get("openapi.version", "0.0.0")
-    marshmallow_plugin = MarshmallowPlugin(
-        schema_name_resolver=schema_name_resolver,
-    )
-    spec = APISpec(
-        title=title,
-        version=version,
-        openapi_version="3.0.2",
-        plugins=[marshmallow_plugin],
-    )
-    for path, operations in list_paths(registry.introspector):
-        final_ops = dict()
-        for method, view in operations.items():
-            if zone is not None and zone != view.get("api_zone"):
-                continue
-            summary, descr, user_op = split_docstring(view["callable"].__doc__)
-            op = {
-                "responses": dict(),
-                "parameters": [],
-            }
-            if summary:
-                op["summary"] = summary
-            if descr:
-                op["description"] = descr
-            set_url_params(spec, op, view)
-            if "validate" in view:
-                if method == "get":
-                    set_query_params(spec, op, view)
-                else:
-                    set_request_body(spec, op, view)
-            if "marshal" in view:
-                set_response_body(spec, op, view)
-            set_tag(spec, op, view)
-            final_op = utils.deepupdate(op, user_op)
-            final_op = utils.deepupdate(final_op, view.get("api_spec", dict()))
-
-            # We are required to have some response, so make one up.
-            if not final_op["responses"]:
-                final_op["responses"]["200"] = {
-                    "description": "",
-                }
-            final_ops[method] = final_op
-        spec.path(path, operations=final_ops)
-
-    json = spec.to_dict()
-    return _perform_merges(json, merge, registry.settings.get("openapi.merge"))
-
-
-def _perform_merges(json, mergefile, merge_setting):
-    # Perform merges
-    if mergefile is None:
-        merges = []
-    elif isinstance(mergefile, str):
-        merges = [merge]
-    else:
-        merges = merge
-    if not merge_setting:
-        pass
-    elif isinstance(merge_setting, str):
-        merges.extend(x.strip() for x in merge_setting.split(","))
-    else:
-        merges.extend(merge_setting)
-    for mergefile in merges:
-        json = merge(json, mergefile)
-    return json
-
-
-def merge(spec, mergefile):
-    if ":" in mergefile:
-        module, _, path = mergefile.partition(":")
-        fh = pkg_resources.resource_stream(module, path)
-    else:
-        fh = open(mergefile)
-    with fh:
-        to_merge = yaml.safe_load(fh)
-    return utils.deepupdate(spec, to_merge)
-
-
-def generate_html(spec):
-    data = json.dumps(spec)
-    return HTML_TEMPLATE.format(
-        title=spec["info"]["title"],
-        version=spec["info"]["version"],
-        spec=data,
+def json_view(request, zone=None, merge=None):
+    generator = request.registry.getUtility(ISpecGenerator)
+    indent = 2 if "pretty" in request.GET else None
+    body = json.dumps(generator(zone, merge), indent=indent)
+    return Response(
+        body=body,
+        content_type="application/json",
+        charset="utf-8",
     )
 
 
-HTML_TEMPLATE = """
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>{title} {version}</title>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400\
-,700|Roboto:300,400,700" rel="stylesheet">
-        <style>
-            body {{
-                margin: 0;
-                padding: 0;
-            }}
-        </style>
-    </head>
-    <body>
-        <div id="redoc"></div>
-        <script type="text/json" id="spec">{spec}</script>
-        <script src="https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.sta\
-ndalone.js"></script>
-        <script>
-            window.addEventListener('load', function() {{
-                var el = document.getElementById('redoc');
-                var spec = JSON.parse(document.getElementById('spec').text);
-                Redoc.init(spec, {{}}, el);
-            }});
-        </script>
-    </body>
-</html>
-"""
+def add_openapi_html_view(config, zone=None, merge=None, *args, **kwargs):
+    """
+    Add a view that returns a redoc page for a spec with the given zone and
+    mergefiles.  Additional args are passed to `Configuration.add_view`.
+
+    """
+    config.add_view(
+        _inject_params(html_view, zone=zone, merge=merge),
+        *args,
+        **kwargs,
+    )
+
+
+def html_view(request, zone=None, merge=None):
+    generator = request.registry.getUtility(ISpecGenerator)
+    body = generate_html(generator(zone, merge))
+    return Response(
+        body=body,
+        content_type="text/html",
+    )
+
+
+def add_openapi_yaml_view(config, zone=None, merge=None, *args, **kwargs):
+    """
+    Add a view that returns a YAML spec with the given zone and mergefiles.
+    Additional args are passed to `Configuration.add_view`.
+
+    """
+    config.add_view(
+        _inject_params(yaml_view, zone=zone, merge=merge),
+        *args,
+        **kwargs,
+    )
+
+
+def yaml_view(request, zone=None, merge=None):
+    generator = request.registry.getUtility(ISpecGenerator)
+    body = generate_yaml(generator(zone, merge))
+    return Response(
+        body=body,
+        content_type="text/yaml",
+    )
