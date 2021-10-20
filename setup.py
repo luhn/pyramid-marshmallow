@@ -20,7 +20,7 @@ CLASSIFIERS = [
 ]
 
 REQUIRES = [
-    "pyramid~=1.7",
+    "pyramid>=1.7",
     "marshmallow~=3.0"
 ]
 
