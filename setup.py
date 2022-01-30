@@ -27,8 +27,8 @@ REQUIRES = [
 
 EXTRAS_REQUIRE = {
     "apispec": [
-        "apispec~=3.0",
-        "PyYAML~=5.4",
+        "apispec>=3.0,<6",
+        "PyYAML>=5.4,<7",
     ],
     "testing": [
         "pytest~=6.2",
