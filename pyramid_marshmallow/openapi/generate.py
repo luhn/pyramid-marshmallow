@@ -20,7 +20,7 @@ parser.add_argument(
     "--zone",
     help=(
         "The API zone to generate spec for.  See documentation for more "
-        "details.",
+        "details."
     ),
 )
 parser.add_argument(
