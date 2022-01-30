@@ -213,9 +213,9 @@ def _perform_merges(json, mergefile, merge_setting):
     if mergefile is None:
         merges = []
     elif isinstance(mergefile, str):
-        merges = [merge]
+        merges = [mergefile]
     else:
-        merges = merge
+        merges = mergefile
     if not merge_setting:
         pass
     elif isinstance(merge_setting, str):
