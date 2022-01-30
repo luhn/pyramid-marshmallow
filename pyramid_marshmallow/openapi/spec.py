@@ -239,7 +239,7 @@ def merge(spec, mergefile):
 
 
 def generate_html(spec):
-    data = json.dumps(spec)
+    data = json.dumps(spec, sort_keys=True)
     return HTML_TEMPLATE.format(
         title=spec["info"]["title"],
         version=spec["info"]["version"],

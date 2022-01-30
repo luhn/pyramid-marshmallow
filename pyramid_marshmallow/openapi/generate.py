@@ -52,7 +52,7 @@ def generate():
         raise ValueError("Must specify one of [app] or --ini.")
     spec_json = create_spec(app.registry, zone=args.zone, merge=args.merge)
     if args.format == "json":
-        output = json.dumps(spec_json)
+        output = json.dumps(spec_json, sort_keys=True)
     elif args.format == "yaml":
         output = generate_yaml(spec_json)
     elif args.format == "html":
