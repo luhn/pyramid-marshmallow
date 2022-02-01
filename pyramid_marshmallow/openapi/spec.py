@@ -2,11 +2,11 @@ import json
 
 import pkg_resources
 from marshmallow import Schema
+from pyramid.path import DottedNameResolver
 
 try:
     import yaml
     from apispec import APISpec, utils, yaml_utils
-    from apispec.ext.marshmallow import MarshmallowPlugin
     from apispec.ext.marshmallow.common import (
         resolve_schema_cls,
         resolve_schema_instance,
@@ -161,8 +161,14 @@ def set_tag(spec, op, view):
 def create_spec(registry, zone=None, merge=None):
     title = registry.settings.get("openapi.title", "Untitled")
     version = registry.settings.get("openapi.version", "0.0.0")
+    name_resolver = DottedNameResolver()
+    MarshmallowPlugin = name_resolver.maybe_resolve(
+        registry.settings.get(
+            "openapi.plugin", "apispec.ext.marshmallow.MarshmallowPlugin"
+        )
+    )
     marshmallow_plugin = MarshmallowPlugin(
-        schema_name_resolver=schema_name_resolver,
+        schema_name_resolver=schema_name_resolver
     )
     spec = APISpec(
         title=title,
