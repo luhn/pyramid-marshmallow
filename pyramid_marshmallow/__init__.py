@@ -1,11 +1,7 @@
 from marshmallow import Schema, ValidationError
 from pyramid.viewderivers import VIEW
 
-from .utils import NonceSchema, make_schema
-
 __all__ = [
-    "make_schema",
-    "NonceSchema",
     "ValidationError",
 ]
 
@@ -14,6 +10,16 @@ def includeme(config):
     config.add_view_deriver(view_validator)
     config.add_view_deriver(view_marshaller, under="rendered_view", over=VIEW)
     config.add_view_deriver(view_api_spec)
+
+
+def make_schema(schema=None, **kwargs):
+    """
+    Create a schema from a dictionary.
+
+    **Deprecated**:  Use `Schema.from_dict` instead.
+
+    """
+    return Schema.from_dict(schema or kwargs)
 
 
 def process_schema(schema):
@@ -27,8 +33,7 @@ def process_schema(schema):
     elif isinstance(schema, Schema):
         return schema
     elif isinstance(schema, dict):
-        _Schema = make_schema(schema)
-        return _Schema()
+        return Schema.from_dict(schema)()
     else:
         raise TypeError("Schema is of invalid type.")
 

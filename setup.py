@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-VERSION = "0.6.3"
+VERSION = "0.7.0"
 CLASSIFIERS = [
     "Development Status :: 3 - Alpha",
     "Framework :: Pyramid",
@@ -21,13 +21,14 @@ CLASSIFIERS = [
 
 REQUIRES = [
     "pyramid>=1.7",
-    "marshmallow~=3.0"
+    "marshmallow~=3.0",
+    "zope.interface>=3.8.0",
 ]
 
 EXTRAS_REQUIRE = {
     "openapi": [
-        "apispec~=3.0",
-        "PyYAML~=5.4",
+        "apispec>=3.0,<6",
+        "PyYAML>=5.4,<7",
     ],
     "testing": [
         "pytest~=6.2",
@@ -61,4 +62,10 @@ setup(
     install_requires=REQUIRES,
     extras_require=EXTRAS_REQUIRE,
     python_requires=">=3.6",
+    entry_points={
+        "console_scripts": [
+            "generate-spec=pyramid_marshmallow.openapi.generate:generate",
+            "serve-spec=pyramid_marshmallow.openapi.serve:serve",
+        ],
+    },
 )
