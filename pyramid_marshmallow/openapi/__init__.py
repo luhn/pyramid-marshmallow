@@ -37,8 +37,11 @@ class SpecGenerator:
     def __init__(self, registry):
         self.registry = registry
 
-    @functools.lru_cache
     def __call__(self, zone, merge):
+        return self._call(zone, tuple(merge))
+
+    @functools.lru_cache
+    def _call(self, zone, merge):
         return create_spec(self.registry, zone=zone, merge=merge)
 
 
