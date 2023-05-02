@@ -4,6 +4,7 @@ from unittest.mock import Mock
 
 import pytest
 from marshmallow import Schema, fields
+from pyramid.httpexceptions import HTTPNoContent
 
 from pyramid_marshmallow import view_marshaller
 
@@ -39,3 +40,10 @@ def test_marshal(wrap_view):
         "release_date": "1971-12-17",
     }
     unwrapped.assert_called_once_with("context", "request")
+
+
+def test_marshal_http_response(wrap_view):
+    unwrapped = Mock(return_value=HTTPNoContent())
+    view = wrap_view(unwrapped)
+    resp = view("context", "request")
+    assert isinstance(resp, HTTPNoContent)

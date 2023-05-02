@@ -1,4 +1,5 @@
 from marshmallow import Schema, ValidationError
+from pyramid.response import Response
 from pyramid.viewderivers import VIEW
 
 __all__ = [
@@ -66,7 +67,10 @@ def view_marshaller(view, info):
 
     def wrapped(context, request):
         output = view(context, request)
-        return schema.dump(output)
+        if isinstance(output, Response):
+            return output
+        else:
+            return schema.dump(output)
 
     return wrapped
 
