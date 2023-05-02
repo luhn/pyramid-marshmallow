@@ -38,7 +38,7 @@ class SpecGenerator:
         self.registry = registry
 
     def __call__(self, zone, merge):
-        return self._call(zone, tuple(merge))
+        return self._call(zone, tuple(merge) if merge else tuple())
 
     @functools.lru_cache
     def _call(self, zone, merge):
