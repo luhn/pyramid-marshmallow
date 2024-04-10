@@ -176,6 +176,10 @@ def create_spec(registry, zone=None, merge=None):
         openapi_version="3.0.2",
         plugins=[marshmallow_plugin],
     )
+    plugin_hook = registry.settings.get("openapi.plugin_hook")
+    if plugin_hook:
+        plugin_hook = name_resolver.maybe_resolve(plugin_hook)
+        plugin_hook(registry, spec, marshmallow_plugin)
     for path, operations in list_paths(registry.introspector):
         final_ops = dict()
         for method, view in operations.items():
