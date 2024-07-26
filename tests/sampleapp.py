@@ -14,8 +14,9 @@ class AlbumSchema(Schema):
 
     """
 
-    title = fields.Str()
+    title = fields.String()
     release_date = fields.Date(allow_null=True)
+    artists = fields.List(fields.String())
 
 
 class Root(dict):
@@ -73,6 +74,14 @@ def validate(request):
     return Response(request.data["title"])
 
 
+def validate_list(request):
+    assert request.data == {
+        "title": "Hunky Dory",
+        "artists": ["Bowie", "Wowie"],
+    }
+    return Response(", ".join(request.data["artists"]))
+
+
 def marshal(request):
     """
     Returns JSON-serialized information about the album.
@@ -127,6 +136,14 @@ def config():
         config.add_view(
             validate,
             route_name="validate",
+            validate=AlbumSchema(),
+            request_method=("GET", "POST"),
+        )
+
+        config.add_route("validate-list", "/validate-list")
+        config.add_view(
+            validate_list,
+            route_name="validate-list",
             validate=AlbumSchema(),
             request_method=("GET", "POST"),
         )

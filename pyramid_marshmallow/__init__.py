@@ -1,4 +1,4 @@
-from marshmallow import Schema, ValidationError
+from marshmallow import Schema, ValidationError, fields
 from pyramid.response import Response
 from pyramid.viewderivers import VIEW
 
@@ -48,7 +48,11 @@ def view_validator(view, info):
         if request.method == "GET":
             data = dict()
             for k, v in request.GET.items():
-                data[k] = v
+                field = schema.fields.get(k)
+                if isinstance(field, fields.List):
+                    data.setdefault(k, []).append(v)
+                else:
+                    data[k] = v
         else:
             data = request.json_body
         request.data = schema.load(data)

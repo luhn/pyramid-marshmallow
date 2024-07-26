@@ -35,6 +35,19 @@ def test_get_validate_integration(app):
     )
 
 
+def test_get_validate_list_integration(app):
+    assert (
+        app.get(
+            "/validate-list",
+            {
+                "title": "Hunky Dory",
+                "artists": ["Bowie", "Wowie"],
+            },
+        ).text
+        == "Bowie, Wowie"
+    )
+
+
 def test_marshal_integration(app):
     assert app.get("/marshal").json == {
         "title": "Hunky Dory",
