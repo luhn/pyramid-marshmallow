@@ -7,4 +7,13 @@ lint:
 test: lint
 	pytest tests
 
-.PHONY: lint test
+build:
+	rm -r dist/ || true
+	pip install -q build
+	python -m build --sdist --wheel --outdir dist/
+
+publish: build
+	pip install -q twine
+	python -m twine upload dist/*
+
+.PHONY: lint test build publish
