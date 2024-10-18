@@ -23,8 +23,7 @@ class ISpecGenerator(Interface):
 
     """
 
-    def __call__(zone, merge):
-        ...
+    def __call__(zone, merge): ...
 
 
 @implementer(ISpecGenerator)

@@ -54,7 +54,7 @@ def serve():
         raise ValueError("Must specify one of [app] or --ini.")
     wsgi_app = create_wsgi_app(args, app.registry)
     server = make_server(args.host, args.port, wsgi_app)
-    print(f"Starting server on { args.host }:{ args.port }")
+    print(f"Starting server on { args.host }:{ args.port }")  # noqa: T201
     server.serve_forever()
 
 

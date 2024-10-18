@@ -60,7 +60,7 @@ def generate():
     else:
         raise ValueError('Format must be one of "json", "yaml", or "html".')
     if args.output == "-":
-        print(output)
+        print(output)  # noqa: T201
     else:
         with open(args.output, "wb") as fh:
             if isinstance(output, str):

@@ -45,9 +45,7 @@ jobs:
           python-version: 3.8
       - name: Install
         run: pip install .[linting]
-      - name: Flake8
-        run: flake8 pyramid_marshmallow tests
-      - name: Black
-        run: black --check pyramid_marshmallow tests
-      - name: isort
-        run: isort --check pyramid_marshmallow tests
+      - name: Lint
+        run: ruff check pyramid_marshmallow tests
+      - name: Format
+        run: ruff format --check pyramid_marshmallow tests

@@ -1,8 +1,10 @@
 
 lint:
-	isort pyramid_marshmallow tests
-	black pyramid_marshmallow tests
-	flake8 pyramid_marshmallow tests
+	ruff check pyramid_marshmallow tests
+	ruff format --check pyramid_marshmallow tests
+
+format:
+	ruff format pyramid_marshmallow tests
 
 test: lint
 	pytest tests
