@@ -29,7 +29,7 @@ def schema_name_resolver(schema):
         # If schema includes only select fields, treat it as nonce
         return False
     if name.endswith("Schema"):
-        return name[:-6] or name
+        name = name[:-6] or name
     if instance.partial:
         name = "Partial" + name
     return name
