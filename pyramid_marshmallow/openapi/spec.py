@@ -25,7 +25,7 @@ def schema_name_resolver(schema):
     if not cls.opts.register:
         # Unregistered schemas are put inline.
         return False
-    if instance.only:
+    if instance.only or instance.exclude:
         # If schema includes only select fields, treat it as nonce
         return False
     if name.endswith("Schema"):
