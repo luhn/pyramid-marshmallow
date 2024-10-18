@@ -15,7 +15,7 @@ class AlbumSchema(Schema):
     """
 
     title = fields.String()
-    release_date = fields.Date(allow_null=True)
+    release_date = fields.Date(allow_none=True)
     artists = fields.List(fields.String())
 
 
