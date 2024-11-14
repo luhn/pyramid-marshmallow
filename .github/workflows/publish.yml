@@ -5,11 +5,15 @@ on:
     types: [published]
 
 jobs:
+  test:
+    uses: ./.github/workflows/test.yml
+
   publish:
     name: "Publish"
     runs-on: ubuntu-latest
     permissions:
       id-token: write
+    needs: test
     steps:
       - uses: actions/checkout@v4
       - name: Setup python
