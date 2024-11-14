@@ -159,11 +159,19 @@ def set_tag(spec, op, view):
 
 
 def create_spec(registry, zone=None, merge=None):
-    title = registry.settings.get("openapi.title", "Untitled")
-    version = registry.settings.get("openapi.version", "0.0.0")
+    settings = registry.settings
+    REQUIRED_SETTINGS = [
+        "openapi.title",
+        "openapi.version",
+        "openapi.openapi_version",
+    ]
+    for key in REQUIRED_SETTINGS:
+        if key not in settings:
+            raise ValueError(f"`{key}` setting is required.")
+
     name_resolver = DottedNameResolver()
     MarshmallowPlugin = name_resolver.maybe_resolve(
-        registry.settings.get(
+        settings.get(
             "openapi.plugin", "apispec.ext.marshmallow.MarshmallowPlugin"
         )
     )
@@ -171,12 +179,12 @@ def create_spec(registry, zone=None, merge=None):
         schema_name_resolver=schema_name_resolver
     )
     spec = APISpec(
-        title=title,
-        version=version,
-        openapi_version="3.0.2",
+        title=settings["openapi.title"],
+        version=settings["openapi.version"],
+        openapi_version=settings["openapi.openapi_version"],
         plugins=[marshmallow_plugin],
     )
-    plugin_hook = registry.settings.get("openapi.plugin_hook")
+    plugin_hook = settings.get("openapi.plugin_hook")
     if plugin_hook:
         plugin_hook = name_resolver.maybe_resolve(plugin_hook)
         plugin_hook(registry, spec, marshmallow_plugin)
@@ -215,7 +223,7 @@ def create_spec(registry, zone=None, merge=None):
         spec.path(path, operations=final_ops)
 
     json = spec.to_dict()
-    return _perform_merges(json, merge, registry.settings.get("openapi.merge"))
+    return _perform_merges(json, merge, settings.get("openapi.merge"))
 
 
 def _perform_merges(json, mergefile, merge_setting):

@@ -106,6 +106,18 @@ First, you'll need to install some extra dependencies.
 pip install pyramid-marshmallow[openapi]
 ```
 
+Before you generate the OpenAPI spec, you'll need to add `openapi.title` (your application name), `openapi.version` (your application version), and `openapi.openapi_version` (the OpenAPI Specification version) to the Pyramid settings.
+If you use paste-style configuration, this might look like this:
+
+```
+[app:main]
+use = egg:myproject
+
+openapi.title = My Project
+openapi.version = 1.0
+openapi.openapi_version = 3.1.1
+```
+
 You can generate your spec by calling the `generate-spec` command with your application as the first argument, formatted as `[module]:[name]`.
 
 ```bash
@@ -122,9 +134,6 @@ This will output the spec to stdout as JSON.
 You can set the `--output` flag to output the results to a file.
 
 You can set `--format yaml` to output the spec as YAML instead or `--format html` to output the spec as an HTML file, powered by [ReDoc](https://github.com/Redocly/redoc).
-
-By default, your spec will be titled "Untitled" and versioned "0.1.0".
-You can change this by setting `openapi.title` and `openapi.version` in your ini file.
 
 ### Documenting Your API
 
