@@ -1,7 +1,11 @@
 name: Tests
 
 on:
-  - push
+  push:
+    branches:
+      - main
+      - staging
+  pull_request: {}
 
 jobs:
   test:
