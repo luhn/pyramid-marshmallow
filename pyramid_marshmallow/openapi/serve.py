@@ -1,17 +1,21 @@
 import argparse
-from importlib import import_module
 from wsgiref.simple_server import make_server
 
 from pyramid.config import Configurator
 from pyramid.paster import get_app
 
 from . import ISpecGenerator, SpecGenerator
+from .cli import import_attr
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
     "app",
     nargs="?",
-    help="The app module.  In the format `module:variable`.",
+    help=(
+        "The Pyramid application to generate spec from, in the format "
+        "`module:attribute`.  If ending in `()`, the attribute will be "
+        "invoked with no arguments and the result used as the application."
+    ),
 )
 parser.add_argument(
     "--ini",
@@ -47,7 +51,7 @@ def serve():
     if args.app and args.ini:
         raise ValueError("Cannot specify both [app] and --ini.")
     elif args.app:
-        app = import_app(args.app)
+        app = import_attr(args.app)
     elif args.ini:
         app = get_app(args.ini)
     else:
@@ -81,12 +85,6 @@ def create_wsgi_app(args, registry):
         route_name="yaml",
     )
     return config.make_wsgi_app()
-
-
-def import_app(name):
-    module_name, _, var_name = name.partition(":")
-    module = import_module(module_name)
-    return getattr(module, var_name)
 
 
 if __name__ == "__main__":

@@ -4,13 +4,18 @@ from importlib import import_module
 
 from pyramid.paster import get_app
 
+from .cli import import_attr
 from .spec import create_spec, generate_html, generate_yaml
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
     "app",
     nargs="?",
-    help="The app module.  In the format `module:variable`.",
+    help=(
+        "The application to load, in the format `module:attribute`.  If "
+        "ending in `()`, the attribute will be invoked with no arguments and "
+        "the result used as the application."
+    ),
 )
 parser.add_argument(
     "--ini",
@@ -45,7 +50,7 @@ def generate():
     if args.app and args.ini:
         raise ValueError("Cannot specify both [app] and --ini.")
     elif args.app:
-        app = import_app(args.app)
+        app = import_attr(args.app)
     elif args.ini:
         app = get_app(args.ini)
     else:
