@@ -3,6 +3,9 @@ lint:
 	ruff check pyramid_marshmallow tests
 	ruff format --check pyramid_marshmallow tests
 
+lint-fix:
+	ruff check --fix pyramid_marshmallow tests
+
 format:
 	ruff format pyramid_marshmallow tests
 
