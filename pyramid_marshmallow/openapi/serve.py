@@ -1,10 +1,9 @@
 from wsgiref.simple_server import make_server
 
 from pyramid.config import Configurator
-from pyramid.paster import get_app
 
 from . import ISpecGenerator, SpecGenerator
-from .cli import base_parser, import_attr
+from .cli import base_parser, import_app
 
 parser = base_parser()
 parser.add_argument(
@@ -22,14 +21,7 @@ parser.add_argument(
 
 def serve():
     args = parser.parse_args()
-    if args.app and args.ini:
-        raise ValueError("Cannot specify both [app] and --ini.")
-    elif args.app:
-        app = import_attr(args.app)
-    elif args.ini:
-        app = get_app(args.ini)
-    else:
-        raise ValueError("Must specify one of [app] or --ini.")
+    app = import_app(args)
     wsgi_app = create_wsgi_app(args, app.registry)
     server = make_server(args.host, args.port, wsgi_app)
     print(f"Starting server on {args.host}:{args.port}")  # noqa: T201

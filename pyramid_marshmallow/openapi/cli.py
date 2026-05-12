@@ -1,6 +1,8 @@
 import argparse
 from importlib import import_module
 
+from pyramid import paster
+
 
 def import_attr(spec):
     """
@@ -20,6 +22,21 @@ def import_attr(spec):
     module = import_module(module_name)
     attr = getattr(module, attr_name)
     return attr() if is_function else attr
+
+
+def import_app(args):
+    """
+    Given the arguments from :func:`base_parser`, return the specified Pyramid
+    application.
+    """
+    if args.app and args.ini:
+        raise ValueError("Cannot specify both [app] and --ini.")
+    elif args.app:
+        return import_attr(args.app)
+    elif args.ini:
+        return paster.get_app(args.ini)
+    else:
+        raise ValueError("Must specify one of [app] or --ini.")
 
 
 def base_parser():
