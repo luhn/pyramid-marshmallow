@@ -1,3 +1,4 @@
+import argparse
 from importlib import import_module
 
 
@@ -19,3 +20,37 @@ def import_attr(spec):
     module = import_module(module_name)
     attr = getattr(module, attr_name)
     return attr() if is_function else attr
+
+
+def base_parser():
+    """
+    Return an :class:`argpase.ArgumentParser` populated with arguments shared
+    between ``serve-spec`` and ``generate-spec``.
+    """
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "app",
+        nargs="?",
+        help=(
+            "The application to load, in the format `module:attribute`.  If "
+            "ending in `()`, the attribute will be invoked with no arguments "
+            "and the result used as the application."
+        ),
+    )
+    parser.add_argument(
+        "--ini",
+        help="If specified, load the app via Paste from an ini file.",
+    )
+    parser.add_argument(
+        "--zone",
+        help=(
+            "The API zone to generate spec for.  See documentation for more "
+            "details."
+        ),
+    )
+    parser.add_argument(
+        "--merge",
+        help="A YAML file to merge with the generated spec.",
+        nargs="*",
+    )
+    return parser

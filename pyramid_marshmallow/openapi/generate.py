@@ -1,38 +1,12 @@
-import argparse
 import json
 from importlib import import_module
 
 from pyramid.paster import get_app
 
-from .cli import import_attr
+from .cli import base_parser, import_attr
 from .spec import create_spec, generate_html, generate_yaml
 
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "app",
-    nargs="?",
-    help=(
-        "The application to load, in the format `module:attribute`.  If "
-        "ending in `()`, the attribute will be invoked with no arguments and "
-        "the result used as the application."
-    ),
-)
-parser.add_argument(
-    "--ini",
-    help="If specified, load the app via Paste from an ini file.",
-)
-parser.add_argument(
-    "--zone",
-    help=(
-        "The API zone to generate spec for.  See documentation for more "
-        "details."
-    ),
-)
-parser.add_argument(
-    "--merge",
-    help="A YAML file to merge with the generated spec.",
-    nargs="*",
-)
+parser = base_parser()
 parser.add_argument(
     "--format",
     help='The output, one of "json", "yaml", or "html".',

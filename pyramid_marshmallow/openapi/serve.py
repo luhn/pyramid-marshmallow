@@ -1,26 +1,12 @@
-import argparse
 from wsgiref.simple_server import make_server
 
 from pyramid.config import Configurator
 from pyramid.paster import get_app
 
 from . import ISpecGenerator, SpecGenerator
-from .cli import import_attr
+from .cli import base_parser, import_attr
 
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "app",
-    nargs="?",
-    help=(
-        "The Pyramid application to generate spec from, in the format "
-        "`module:attribute`.  If ending in `()`, the attribute will be "
-        "invoked with no arguments and the result used as the application."
-    ),
-)
-parser.add_argument(
-    "--ini",
-    help="If specified, load the app via Paste from an ini file.",
-)
+parser = base_parser()
 parser.add_argument(
     "--host",
     help="The host to bind to.  Defaults to 0.0.0.0.",
@@ -31,18 +17,6 @@ parser.add_argument(
     type=int,
     help="The port to bind to.  Defaults to 8080.",
     default=8080,
-)
-parser.add_argument(
-    "--zone",
-    help=(
-        "The API zone to generate spec for.  See documentation for more "
-        "details."
-    ),
-)
-parser.add_argument(
-    "--merge",
-    help="A YAML file to merge with the generated spec.",
-    nargs="*",
 )
 
 
