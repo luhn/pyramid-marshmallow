@@ -33,7 +33,11 @@ def serve():
     wsgi_app = create_wsgi_app(args, app.registry)
     server = make_server(args.host, args.port, wsgi_app)
     print(f"Starting server on {args.host}:{args.port}")  # noqa: T201
-    server.serve_forever()
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        ...  # Quietly exit.
+    return 1
 
 
 def create_wsgi_app(args, registry):
