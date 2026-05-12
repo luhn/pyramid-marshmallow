@@ -22,8 +22,8 @@ jobs:
           - "pypy3.9"
           - "pypy3.10"
         pyramid_version:
-          - "<2"
-          - ">=2"
+          - "1.x"
+          - "2.x"
 
     name: "Python: ${{ matrix.py }}, Pyramid: ${{ matrix.pyramid_version }}"
     runs-on: ubuntu-latest
@@ -34,7 +34,13 @@ jobs:
         with:
           python-version: ${{ matrix.py }}
       - name: Install
-        run: pip install .[testing] "pyramid${{ matrix.pyramid_version }}"
+        run: |
+          if [[ "${{ matrix.pyramid_version }}" == "1.x" ]]; then
+            EXTRAS="pyramid<2 setuptools<82"
+          else
+            EXTRAS="pyramid>=2"
+          fi
+          pip install .[testing] $EXTRAS
       - name: Running tests
         run: pytest tests -v
 
