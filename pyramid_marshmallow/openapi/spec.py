@@ -284,8 +284,8 @@ HTML_TEMPLATE = """
     <body>
         <div id="redoc"></div>
         <script type="text/json" id="spec">{spec}</script>
-        <script src="https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.sta\
-ndalone.js"></script>
+        <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalon\
+e.js"></script>
         <script>
             window.addEventListener('load', function() {{
                 var el = document.getElementById('redoc');
