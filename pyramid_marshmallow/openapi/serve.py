@@ -1,3 +1,5 @@
+import signal
+from threading import Thread
 from wsgiref.simple_server import make_server
 
 from pyramid.config import Configurator
@@ -23,13 +25,45 @@ def serve():
     args = parser.parse_args()
     app = import_app(args)
     wsgi_app = create_wsgi_app(args, app.registry)
-    server = make_server(args.host, args.port, wsgi_app)
-    print(f"Starting server on {args.host}:{args.port}")  # noqa: T201
-    try:
-        server.serve_forever()
-    except KeyboardInterrupt:
-        ...  # Quietly exit.
+    return start_server(args.host, args.port, wsgi_app)
+
+
+def start_server(host, port, wsgi_app):
+    server = make_server(host, port, wsgi_app)
+    print(f"Starting server on {host}:{port}")  # noqa: T201
+    stopper = ServerStopper(server)
+    stopper.register()
+    server.serve_forever()
     return 1
+
+
+class ServerStopper:
+    def __init__(self, server):
+        """
+        A class that handles signals and stops the server.
+        """
+        self.server = server
+
+    def stop(self):
+        """
+        Stop the server.
+        """
+        t = Thread(target=self.server.shutdown)
+        t.start()
+
+    def signal(self, signalnum, frame):
+        """
+        Handle a signal.
+        """
+        print("Stopping server...")  # noqa: T201
+        self.stop()
+
+    def register(self):
+        """
+        Register a SIGTERM handler.
+        """
+        signal.signal(signal.SIGTERM, self.signal)
+        signal.signal(signal.SIGINT, self.signal)
 
 
 def create_wsgi_app(args, registry):
