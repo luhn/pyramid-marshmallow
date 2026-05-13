@@ -118,11 +118,13 @@ openapi.version = 1.0
 openapi.openapi_version = 3.1.1
 ```
 
-You can generate your spec by calling the `generate-spec` command with your application as the first argument, formatted as `[module]:[name]`.
+You can generate your spec by calling the `generate-spec` command with your Pyramid application as the first argument, formatted as `[module]:[name]`.
 
 ```bash
 generate-spec myproject:app
 ```
+
+You can suffix with a pair of parentheses (`myproject:app()`) and the attribute will be invoke as a function and the result used as the Pyramid application.
 
 If you configure your application via an ini file (Paste), you can also use that.
 
@@ -134,6 +136,20 @@ This will output the spec to stdout as JSON.
 You can set the `--output` flag to output the results to a file.
 
 You can set `--format yaml` to output the spec as YAML instead or `--format html` to output the spec as an HTML file, powered by [ReDoc](https://github.com/Redocly/redoc).
+
+### Local Server
+
+You can also serve your spec locally using `serve-spec`.
+
+```
+serve-spec myproject:app
+```
+
+If you then navigate to `localhost:8080` in your browser, you'll see the spec rendered with [ReDoc](https://github.com/Redocly/redoc).
+
+`serve-spec` has largely the same arguments as `generate-spec`.
+You can control the binding with the `--host` and `--port` arguments.
+Adding the `--watch` flag will automatically reload the server when a file changes.
 
 ### Documenting Your API
 
