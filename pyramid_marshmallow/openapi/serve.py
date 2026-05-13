@@ -1,9 +1,9 @@
 import os
 import signal
 from threading import Thread
-from wsgiref.simple_server import make_server
 
 import hupper
+import waitress
 from pyramid.config import Configurator
 
 from . import ISpecGenerator, SpecGenerator
@@ -38,11 +38,11 @@ def main():
 def serve(args):
     app = import_app(args)
     wsgi_app = create_wsgi_app(args, app.registry)
-    server = make_server(args.host, args.port, wsgi_app)
+    server = waitress.create_server(wsgi_app, host=args.host, port=args.port)
     print(f"Starting server on {args.host}:{args.port}")  # noqa: T201
     stopper = ServerStopper(server)
     stopper.register()
-    server.serve_forever()
+    server.run()
     return 1
 
 
@@ -57,7 +57,7 @@ class ServerStopper:
         """
         Stop the server.
         """
-        t = Thread(target=self.server.shutdown)
+        t = Thread(target=self.server.close)
         t.start()
 
     def signal(self, signalnum, frame):
