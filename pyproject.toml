@@ -1,3 +1,60 @@
+[project]
+name = "pyramid-marshmallow"
+version = "0.8.1"
+description = "Validate request and response data with Marshmallow and optionally generate an OpenAPI spec."
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [
+    {name = "Theron Luhn", email = "theron@luhn.com"}
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Framework :: Pyramid",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Programming Language :: Python",
+]
+dependencies = [
+    "pyramid>=1.7",
+    "marshmallow~=3.0",
+    "zope.interface>=3.8.0",
+]
+
+[project.optional-dependencies]
+openapi = [
+    "apispec>=3.0,<7",
+    "PyYAML>=5.4,<7",
+    "hupper~=1.12",
+    "waitress~=3.0",
+]
+testing = [
+    "pytest~=8.3",
+    "webtest~=2.0",
+]
+linting = [
+    "ruff~=0.15.12",
+]
+
+[project.urls]
+Homepage = "https://github.com/luhn/pyramid-marshmallow"
+
+[project.scripts]
+generate-spec = "pyramid_marshmallow.openapi.generate:main"
+serve-spec = "pyramid_marshmallow.openapi.serve:main"
+
 [build-system]
 requires = [
     "setuptools>=42",
