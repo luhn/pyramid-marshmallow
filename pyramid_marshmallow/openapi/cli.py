@@ -59,6 +59,14 @@ def base_parser():
         help="If specified, load the app via Paste from an ini file.",
     )
     parser.add_argument(
+        "--watch",
+        action="store_true",
+        help=(
+            "If set, files will be watched for changes and the spec "
+            "regenerated."
+        ),
+    )
+    parser.add_argument(
         "--zone",
         help=(
             "The API zone to generate spec for.  See documentation for more "

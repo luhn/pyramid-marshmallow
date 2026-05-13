@@ -1,7 +1,9 @@
+import os
 import signal
 from threading import Thread
 from wsgiref.simple_server import make_server
 
+import hupper
 from pyramid.config import Configurator
 
 from . import ISpecGenerator, SpecGenerator
@@ -21,16 +23,23 @@ parser.add_argument(
 )
 
 
-def serve():
+def main():
     args = parser.parse_args()
+    if args.watch:
+        reloader = hupper.start_reloader(
+            "pyramid_marshmallow.openapi.serve.main",
+            shutdown_interval=10,
+        )
+        if args.merge:
+            reloader.watch_files(args.merge)
+    return serve(args)
+
+
+def serve(args):
     app = import_app(args)
     wsgi_app = create_wsgi_app(args, app.registry)
-    return start_server(args.host, args.port, wsgi_app)
-
-
-def start_server(host, port, wsgi_app):
-    server = make_server(host, port, wsgi_app)
-    print(f"Starting server on {host}:{port}")  # noqa: T201
+    server = make_server(args.host, args.port, wsgi_app)
+    print(f"Starting server on {args.host}:{args.port}")  # noqa: T201
     stopper = ServerStopper(server)
     stopper.register()
     server.serve_forever()
@@ -92,4 +101,4 @@ def create_wsgi_app(args, registry):
 
 
 if __name__ == "__main__":
-    serve()
+    os.exit(serve())
