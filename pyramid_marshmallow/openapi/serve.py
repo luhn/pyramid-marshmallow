@@ -1,6 +1,4 @@
 import os
-import signal
-from threading import Thread
 
 import hupper
 import waitress
@@ -40,39 +38,8 @@ def serve(args):
     wsgi_app = create_wsgi_app(args, app.registry)
     server = waitress.create_server(wsgi_app, host=args.host, port=args.port)
     print(f"Starting server on {args.host}:{args.port}")  # noqa: T201
-    stopper = ServerStopper(server)
-    stopper.register()
     server.run()
     return 1
-
-
-class ServerStopper:
-    def __init__(self, server):
-        """
-        A class that handles stopping the server on SIGINT or SIGTERM.
-        """
-        self.server = server
-
-    def stop(self):
-        """
-        Stop the server.
-        """
-        t = Thread(target=self.server.close)
-        t.start()
-
-    def signal(self, signalnum, frame):
-        """
-        Handle a signal.
-        """
-        print("Stopping server...")  # noqa: T201
-        self.stop()
-
-    def register(self):
-        """
-        Register a SIGTERM and SIGINT handler.
-        """
-        signal.signal(signal.SIGTERM, self.signal)
-        signal.signal(signal.SIGINT, self.signal)
 
 
 def create_wsgi_app(args, registry):
