@@ -1,5 +1,9 @@
 import json
+import os
 import sys
+import threading
+
+import hupper
 
 from .cli import base_parser, import_app
 from .spec import create_spec, generate_html, generate_yaml
@@ -17,8 +21,28 @@ parser.add_argument(
 )
 
 
-def generate():
+def main():
     args = parser.parse_args()
+    if args.watch:
+        if args.output == "-":
+            sys.stderr.write(
+                "Cannot use stdout output with `--watch`.  Please set "
+                "`--output` to a filename.\n"
+            )
+            return 1
+        reloader = hupper.start_reloader(
+            "pyramid_marshmallow.openapi.generate.main",
+            shutdown_interval=10,
+        )
+        if args.merge:
+            reloader.watch_files(args.merge)
+    generate(args)
+    if hupper.is_active():
+        threading.Event().wait()  # Wait indefinitely
+    return 0
+
+
+def generate(args):
     app = import_app(args)
     spec_json = create_spec(app.registry, zone=args.zone, merge=args.merge)
     if args.format == "json":
@@ -37,7 +61,8 @@ def generate():
             if isinstance(output, str):
                 output = output.encode("utf8")
             fh.write(output)
+        sys.stdout.write("Spec generated\n")
 
 
 if __name__ == "__main__":
-    generate()
+    os.exit(generate())

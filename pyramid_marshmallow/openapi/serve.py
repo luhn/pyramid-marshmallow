@@ -1,3 +1,4 @@
+import os
 import signal
 from threading import Thread
 from wsgiref.simple_server import make_server
@@ -100,4 +101,4 @@ def create_wsgi_app(args, registry):
 
 
 if __name__ == "__main__":
-    serve()
+    os.exit(serve())
