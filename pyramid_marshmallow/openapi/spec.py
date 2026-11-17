@@ -1,8 +1,9 @@
 import json
 
 import pkg_resources
-from marshmallow import Schema
 from pyramid.path import DottedNameResolver
+
+from pyramid_marshmallow import ensure_schema
 
 try:
     import yaml
@@ -84,13 +85,6 @@ def _make_path(introspector, introspectable):
         return None
 
 
-def _schema(schema):
-    if isinstance(schema, dict):
-        return Schema.from_dict(schema)
-    else:
-        return schema
-
-
 def split_docstring(docstring):
     """
     Split a docstring in half, delineated with a "---".  The first half is
@@ -122,7 +116,7 @@ def set_request_body(spec, op, view):
     op["requestBody"] = {
         "content": {
             "application/json": {
-                "schema": _schema(view["validate"]),
+                "schema": ensure_schema(view["validate"]),
             },
         },
     }
@@ -132,7 +126,7 @@ def set_query_params(spec, op, view):
     op["parameters"].append(
         {
             "in": "query",
-            "schema": _schema(view["validate"]),
+            "schema": ensure_schema(view["validate"]),
         }
     )
 
@@ -142,7 +136,7 @@ def set_response_body(spec, op, view):
         "description": "",
         "content": {
             "application/json": {
-                "schema": _schema(view["marshal"]),
+                "schema": ensure_schema(view["marshal"]),
             },
         },
     }
