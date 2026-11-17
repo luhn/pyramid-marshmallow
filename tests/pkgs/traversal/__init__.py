@@ -35,7 +35,7 @@ def includeme(config):
         renderer="json",
     )
     config.add_view(
-        update,
+        like,
         context=Album,
         name="like",
         request_method="POST",
