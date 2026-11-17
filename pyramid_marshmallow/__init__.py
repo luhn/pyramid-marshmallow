@@ -23,24 +23,31 @@ def make_schema(schema=None, **kwargs):
     return Schema.from_dict(schema or kwargs)
 
 
-def process_schema(schema):
+def ensure_schema(schema):
     """
-    Handle a schema passed in as a view deriver, creating a nonce schema if a
-    dictionary.
+    Handle a schema passed in as a view deriver.  Accepts a schema instance, a
+    schema class (which is instantiated), or a dictionary (from which a nonce
+    schema is created).
 
     """
     if schema is None:
         return None
     elif isinstance(schema, Schema):
         return schema
+    elif isinstance(schema, type) and issubclass(schema, Schema):
+        return schema()
     elif isinstance(schema, dict):
         return Schema.from_dict(schema)()
     else:
         raise TypeError("Schema is of invalid type.")
 
 
+# Deprecated alias, use `ensure_schema` instead.
+process_schema = ensure_schema
+
+
 def view_validator(view, info):
-    schema = process_schema(info.options.get("validate"))
+    schema = ensure_schema(info.options.get("validate"))
     if schema is None:
         return view
 
@@ -65,7 +72,7 @@ view_validator.options = ("validate",)
 
 
 def view_marshaller(view, info):
-    schema = process_schema(info.options.get("marshal"))
+    schema = ensure_schema(info.options.get("marshal"))
     if schema is None:
         return view
 
