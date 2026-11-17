@@ -43,7 +43,7 @@ testing = [
     "webtest~=2.0",
 ]
 linting = [
-    "ruff~=0.15.12",
+    "ruff~=0.17.5",
 ]
 
 [project.urls]
