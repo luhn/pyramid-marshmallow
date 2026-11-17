@@ -2,7 +2,11 @@ import pytest
 from marshmallow import Schema, fields
 from pyramid.config import Configurator
 
-from pyramid_marshmallow.openapi.spec import list_paths, schema_name_resolver
+from pyramid_marshmallow.openapi.spec import (
+    list_paths,
+    schema_name_resolver,
+    split_docstring,
+)
 
 
 class TestSchemaNameResolver:
@@ -159,3 +163,96 @@ class TestListPaths:
 
     def test_no_views(self):
         assert self.call() == []
+
+
+class TestSplitDocstring:
+    def call(self, docstring):
+        return split_docstring(docstring)
+
+    def test_none(self):
+        assert self.call(None) == (None, None, {})
+
+    def test_empty(self):
+        assert self.call("") == (None, None, {})
+
+    def test_whitespace_only(self):
+        assert self.call("   \n\n   ") == (None, None, {})
+
+    def test_summary_only(self):
+        assert self.call("Get a widget.") == ("Get a widget.", None, {})
+
+    def test_summary_and_description(self):
+        docstring = """
+        Get a widget.
+
+        Fetches a single widget by its ID.
+        Returns 404 if not found.
+
+        """
+        assert self.call(docstring) == (
+            "Get a widget.",
+            "Fetches a single widget by its ID.\nReturns 404 if not found.",
+            {},
+        )
+
+    def test_description_preserves_relative_indent(self):
+        docstring = """
+        Summary.
+
+        Some text:
+            indented
+        """
+        assert self.call(docstring)[1] == "Some text:\n    indented"
+
+    def test_summary_and_yaml(self):
+        docstring = """
+        Get a widget.
+        ---
+        tags:
+            - widgets
+        """
+        assert self.call(docstring) == (
+            "Get a widget.",
+            None,
+            {"tags": ["widgets"]},
+        )
+
+    def test_summary_description_and_yaml(self):
+        docstring = """
+        Get a widget.
+
+        Fetches a single widget by its ID.
+
+        ---
+        responses:
+            404:
+                description: Not found
+        """
+        assert self.call(docstring) == (
+            "Get a widget.",
+            "Fetches a single widget by its ID.",
+            {"responses": {404: {"description": "Not found"}}},
+        )
+
+    def test_summary_on_first_line(self):
+        docstring = """Get a widget.
+
+        Description.
+        """
+        assert self.call(docstring) == ("Get a widget.", "Description.", {})
+
+    @pytest.mark.xfail(reason="Delimiter on first line is used as summary")
+    def test_yaml_only(self):
+        docstring = """
+        ---
+        deprecated: true
+        """
+        assert self.call(docstring) == (None, None, {"deprecated": True})
+
+    @pytest.mark.xfail(reason="Empty YAML section parses to None, not {}")
+    def test_empty_yaml(self):
+        docstring = """
+        Get a widget.
+        ---
+        """
+        assert self.call(docstring) == ("Get a widget.", None, {})
