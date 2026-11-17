@@ -39,8 +39,8 @@ openapi = [
     "waitress~=3.0",
 ]
 testing = [
-    "pytest~=8.3",
-    "webtest~=2.0",
+    "pytest~=9.2",
+    "webtest~=3.0",
 ]
 linting = [
     "ruff~=0.17.5",
