@@ -87,8 +87,29 @@ def _make_path(introspector, introspectable):
 
 def split_docstring(docstring):
     """
-    Split a docstring in half, delineated with a "---".  The first half is
-    returned verbatim, the second half is parsed as YAML.
+    Split a view's docstring into a summary, description, and OpenAPI
+    operation overrides.
+
+    The docstring is dedented, then divided at the first line beginning with
+    "---".  Above the delimiter, the first line is the summary and the
+    remaining lines are the description.  Everything from the delimiter on is
+    parsed as YAML.  For example::
+
+        Get a widget.
+
+        Fetches a single widget by its ID.
+
+        ---
+        tags:
+            - widgets
+
+    produces ``("Get a widget.", "Fetches a single widget by its ID.",
+    {"tags": ["widgets"]})``.
+
+    :param docstring:  The docstring to split.  May be ``None``.
+    :returns:  A ``(summary, description, operation)`` tuple.  ``summary``
+        and ``description`` are ``None`` if absent or blank.  ``operation``
+        is the parsed YAML, or an empty dict if there is no YAML.
 
     """
     split_lines = utils.trim_docstring(docstring).split("\n")
@@ -102,14 +123,14 @@ def split_docstring(docstring):
     else:
         cut_from = len(split_lines)
 
-    summary = split_lines[0].strip() or None
+    if cut_from > 0:
+        summary = split_lines[0].strip() or None
+    else:
+        summary = None
     docs = "\n".join(split_lines[1:cut_from]).strip() or None
     yaml_string = "\n".join(split_lines[cut_from:])
-    if yaml_string:
-        parsed = yaml.safe_load(yaml_string)
-    else:
-        parsed = dict()
-    return summary, docs, parsed
+    parsed = yaml.safe_load(yaml_string) if yaml_string else None
+    return summary, docs, parsed or dict()
 
 
 def set_request_body(spec, op, view):

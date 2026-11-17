@@ -241,7 +241,6 @@ class TestSplitDocstring:
         """
         assert self.call(docstring) == ("Get a widget.", "Description.", {})
 
-    @pytest.mark.xfail(reason="Delimiter on first line is used as summary")
     def test_yaml_only(self):
         docstring = """
         ---
@@ -249,7 +248,6 @@ class TestSplitDocstring:
         """
         assert self.call(docstring) == (None, None, {"deprecated": True})
 
-    @pytest.mark.xfail(reason="Empty YAML section parses to None, not {}")
     def test_empty_yaml(self):
         docstring = """
         Get a widget.
