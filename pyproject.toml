@@ -3,7 +3,7 @@ name = "pyramid-marshmallow"
 version = "0.8.2"
 description = "Validate request and response data with Marshmallow and optionally generate an OpenAPI spec."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 authors = [
     {name = "Theron Luhn", email = "theron@luhn.com"}
 ]
@@ -15,7 +15,6 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
