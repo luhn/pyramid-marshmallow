@@ -42,22 +42,34 @@ def schema_name_resolver(schema):
 
 
 def list_paths(introspector):
-    for item in introspector.get_category("views"):
-        spect = item["introspectable"]
-        path = make_path(introspector, spect)
+    """
+    Iterate over the views registered with a Pyramid introspector
+    (``registry.introspector``) and yield a ``(path, method, introspectable)``
+    tuple for each HTTP method each view accepts.
+
+    ``path`` is the URL path for the view:  the route pattern for URL dispatch
+    views, or ``context.__path__ + "/" + view_name`` for traversal views.
+    Views for which no path can be determined are skipped.
+
+    ``method`` is the lowercase HTTP method.  Views without a
+    ``request_method`` predicate are treated as ``GET`` only.
+
+    ``introspectable`` is the view's introspectable.
+
+    """
+    for item in introspector.get_category("views", default=[]):
+        introspectable = item["introspectable"]
+        path = _make_path(introspector, introspectable)
         if path is None:
             continue
-        operations = dict()
-        methods = spect["request_methods"] or ["GET"]
+        methods = introspectable["request_methods"] or ["GET"]
         if isinstance(methods, str):
             methods = [methods]
         for method in methods:
-            method = method.lower()
-            operations[method] = spect
-        yield path, operations
+            yield path, method.lower(), introspectable
 
 
-def make_path(introspector, introspectable):
+def _make_path(introspector, introspectable):
     if introspectable["route_name"]:
         route = introspector.get("routes", introspectable["route_name"])
         return route["pattern"]
@@ -194,39 +206,36 @@ def create_spec(registry, zone=None, merge=None):
     if plugin_hook:
         plugin_hook = name_resolver.maybe_resolve(plugin_hook)
         plugin_hook(registry, spec, marshmallow_plugin)
-    for path, operations in list_paths(registry.introspector):
-        final_ops = dict()
-        for method, view in operations.items():
-            if zone is not None and zone != view.get("api_zone"):
-                continue
-            summary, descr, user_op = split_docstring(view["callable"].__doc__)
-            op = {
-                "responses": dict(),
-                "parameters": [],
-            }
-            if summary:
-                op["summary"] = summary
-            if descr:
-                op["description"] = descr
-            set_url_params(spec, op, view)
-            if "validate" in view:
-                if method == "get":
-                    set_query_params(spec, op, view)
-                else:
-                    set_request_body(spec, op, view)
-            if "marshal" in view:
-                set_response_body(spec, op, view)
-            set_tag(spec, op, view)
-            final_op = utils.deepupdate(op, user_op)
-            final_op = utils.deepupdate(final_op, view.get("api_spec", dict()))
+    for path, method, view in list_paths(registry.introspector):
+        if zone is not None and zone != view.get("api_zone"):
+            continue
+        summary, descr, user_op = split_docstring(view["callable"].__doc__)
+        op = {
+            "responses": dict(),
+            "parameters": [],
+        }
+        if summary:
+            op["summary"] = summary
+        if descr:
+            op["description"] = descr
+        set_url_params(spec, op, view)
+        if "validate" in view:
+            if method == "get":
+                set_query_params(spec, op, view)
+            else:
+                set_request_body(spec, op, view)
+        if "marshal" in view:
+            set_response_body(spec, op, view)
+        set_tag(spec, op, view)
+        final_op = utils.deepupdate(op, user_op)
+        final_op = utils.deepupdate(final_op, view.get("api_spec", dict()))
 
-            # We are required to have some response, so make one up.
-            if not final_op["responses"]:
-                final_op["responses"]["200"] = {
-                    "description": "",
-                }
-            final_ops[method] = final_op
-        spec.path(path, operations=final_ops)
+        # We are required to have some response, so make one up.
+        if not final_op["responses"]:
+            final_op["responses"]["200"] = {
+                "description": "",
+            }
+        spec.path(path, operations={method: final_op})
 
     json = spec.to_dict()
     return _perform_merges(json, merge, settings.get("openapi.merge"))
