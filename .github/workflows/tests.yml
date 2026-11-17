@@ -40,7 +40,7 @@ jobs:
           else
             EXTRAS="pyramid>=2"
           fi
-          pip install .[testing] $EXTRAS
+          pip install .[testing,openapi] $EXTRAS
       - name: Running tests
         run: pytest tests -v
 

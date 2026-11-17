@@ -19,6 +19,12 @@ except ImportError:
 
 
 def schema_name_resolver(schema):
+    """
+    Determine a name for the schema.  Takes the class name by default,
+    stripping the ``Schema`` suffix if necessary.  Returns false for schemas
+    that should not be named in the spec, such as unregistered schemas created
+    by ``Schema.from_dict``.
+    """
     cls = resolve_schema_cls(schema)
     instance = resolve_schema_instance(schema)
     name = cls.__name__
