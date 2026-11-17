@@ -12,6 +12,9 @@ format:
 test: lint
 	pytest tests
 
+coverage:
+	pytest tests --cov --cov-report=term --cov-report=html
+
 build:
 	rm -r dist/ || true
 	pip install -q build
@@ -21,4 +24,4 @@ publish: build
 	pip install -q twine
 	python -m twine upload dist/*
 
-.PHONY: lint test build publish
+.PHONY: lint test coverage build publish
